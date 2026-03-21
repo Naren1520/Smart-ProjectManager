@@ -1,15 +1,51 @@
 'use client';
 
-import { Award, CheckCircle } from 'lucide-react';
+import { Award, CheckCircle, Lock, Trophy, Users, Bug } from 'lucide-react';
 import Image from 'next/image';
 import { useSession } from 'next-auth/react';
-import { useRef } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import CertificateActions from '@/components/CertificateActions';
+import { Loader } from '@/components/Loader';
+
+interface Badge {
+  name: string;
+  description: string;
+  icon: string;
+  unlocked: boolean;
+  dateEarned: string | null;
+}
+
+interface RewardsData {
+  points: number;
+  level: number;
+  badges: Badge[];
+}
 
 export default function RewardsPage() {
-  const points = 350;
   const { data: session } = useSession();
   const certificateRef = useRef<HTMLDivElement>(null);
+  const [data, setData] = useState<RewardsData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (session?.user?.email) {
+        try {
+          const response = await fetch('/api/user/rewards');
+          if (response.ok) {
+            const result = await response.json();
+            setData(result);
+          }
+        } catch (error) {
+          console.error('Failed to fetch rewards:', error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchData();
+  }, [session]);
 
   const userName = session?.user?.name || 'Certificate Holder';
   const currentDate = new Date().toLocaleDateString('en-US', {
@@ -18,6 +54,30 @@ export default function RewardsPage() {
     day: 'numeric',
   });
 
+  if (loading) {
+    return <div className="p-8 flex justify-center"><Loader /></div>;
+  }
+
+  const points = data?.points || 0;
+  const level = data?.level || 1;
+  const badges = data?.badges || [];
+
+  const getBadgeIcon = (iconName: string) => {
+    switch(iconName) {
+      case 'Award': return <Award className="w-8 h-8" />;
+      case 'Users': return <Users className="w-8 h-8" />;
+      case 'Bug': return <Bug className="w-8 h-8" />;
+      default: return <Award className="w-8 h-8" />;
+    }
+  };
+
+  const getLevelTitle = (level: number) => {
+    if (level >= 10) return 'Expert Manager';
+    if (level >= 5) return 'Pro Manager';
+    if (level >= 3) return 'Advanced Manager';
+    return 'Novice Manager';
+  };
+
   return (
     <div className="p-8 max-w-4xl mx-auto">
       <div className="mb-8 text-center bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl p-12 text-white shadow-xl relative overflow-hidden">
@@ -25,35 +85,32 @@ export default function RewardsPage() {
         <div className="relative z-10">
             <h1 className="text-4xl font-bold mb-4">Your Achievements</h1>
             <div className="text-6xl font-extrabold mb-2">{points} XP</div>
-            <p className="text-blue-100">Level 5 Pro Manager</p>
+            <p className="text-blue-100">Level {level} {getLevelTitle(level)}</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div className="bg-white dark:bg-neutral-900 rounded-2xl p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm flex items-center justify-between">
+        {badges.map((badge, index) => (
+          <div 
+            key={index} 
+            className={`bg-white dark:bg-neutral-900 rounded-2xl p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm flex items-center justify-between ${!badge.unlocked ? 'opacity-50' : ''}`}
+          >
             <div className="flex items-center gap-4">
-                <div className="p-3 bg-yellow-100 text-yellow-600 rounded-xl">
-                    <Award className="w-8 h-8" />
+                <div className={`p-3 rounded-xl ${badge.unlocked ? 'bg-yellow-100 text-yellow-600' : 'bg-neutral-100 text-neutral-400'}`}>
+                    {getBadgeIcon(badge.icon)}
                 </div>
                 <div>
-                    <h3 className="font-bold text-lg">Top Contributor</h3>
-                    <p className="text-sm text-neutral-500">Completed 5 tasks this week</p>
+                    <h3 className="font-bold text-lg">{badge.name}</h3>
+                    <p className="text-sm text-neutral-500">{badge.description}</p>
                 </div>
             </div>
-            <CheckCircle className="w-6 h-6 text-green-500" />
-        </div>
-         <div className="bg-white dark:bg-neutral-900 rounded-2xl p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm flex items-center justify-between opacity-50">
-            <div className="flex items-center gap-4">
-                <div className="p-3 bg-neutral-100 text-neutral-400 rounded-xl">
-                    <Award className="w-8 h-8" />
-                </div>
-                <div>
-                    <h3 className="font-bold text-lg">Team Leader</h3>
-                    <p className="text-sm text-neutral-500">Lead a team of 3 members</p>
-                </div>
-            </div>
-            <span className="text-xs px-2 py-1 bg-neutral-200 dark:bg-neutral-800 rounded">Locked</span>
-        </div>
+            {badge.unlocked ? (
+              <CheckCircle className="w-6 h-6 text-green-500" />
+            ) : (
+               <span className="text-xs px-2 py-1 bg-neutral-200 dark:bg-neutral-800 rounded flex items-center gap-1"><Lock className="w-3 h-3"/> Locked</span>
+            )}
+          </div>
+        ))}
       </div>
 
       <div className="bg-white dark:bg-neutral-900 rounded-3xl p-8 border border-neutral-200 dark:border-neutral-800 shadow-sm text-center mb-8">

@@ -15,6 +15,14 @@ const UserSchema = new mongoose.Schema({
   resumeUrl: { type: String }, // Link to stored resume
   experience: { type: Number, default: 0 }, // Years of experience
   points: { type: Number, default: 0 }, // Gamification points
+  level: { type: Number, default: 1 },
+  badges: [{
+    name: String,
+    description: String,
+    icon: String, // lucide icon name or image url
+    unlocked: { type: Boolean, default: false },
+    dateEarned: { type: Date }
+  }],
   teams: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Team' }],
   createdAt: { type: Date, default: Date.now },
 });
