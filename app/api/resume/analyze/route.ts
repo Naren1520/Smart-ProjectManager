@@ -27,7 +27,6 @@ export async function POST(req: NextRequest) {
         const buffer = Buffer.from(arrayBuffer);
         const parser = new PDFParse({ data: buffer });
         const pdfData = await parser.getText();
-        resumeText = pdfD= await parser.getText();
         resumeText = pdfData.text;
       } else {
         resumeText = await file.text();
