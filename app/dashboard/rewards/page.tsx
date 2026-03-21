@@ -6,7 +6,8 @@ export default function RewardsPage() {
   const points = 350;
 
   const downloadCertificate = async () => {
-    const { jsPDF } = await import('jspdf');
+    // @ts-ignore
+    const { jsPDF } = await import('jspdf/dist/jspdf.umd.min.js');
     const doc = new jsPDF({
       orientation: 'landscape',
       unit: 'px',
