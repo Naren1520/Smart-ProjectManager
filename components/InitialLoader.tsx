@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Zap } from 'lucide-react';
+import Image from 'next/image';
 
 export function InitialLoader() {
   const [isLoading, setIsLoading] = useState(true);
@@ -55,8 +55,14 @@ export function InitialLoader() {
               transition={{ duration: 0.5, ease: "easeOut" }}
               className="mb-8 relative"
             >
-              <div className="w-24 h-24 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-3xl flex items-center justify-center shadow-2xl shadow-blue-500/30">
-                <Zap className="w-12 h-12 text-white fill-white" />
+              <div className="w-32 h-32 relative rounded-full overflow-hidden shadow-2xl shadow-blue-500/30">
+                <Image 
+                  src="/logo.png" 
+                  alt="TeamForge AI Logo" 
+                  fill
+                  className="object-cover"
+                  priority
+                />
               </div>
               
               {/* Ripple Effect */}
@@ -64,7 +70,7 @@ export function InitialLoader() {
                 initial={{ scale: 1, opacity: 0 }}
                 animate={{ scale: 2, opacity: 0 }}
                 transition={{ duration: 1.5, repeat: Infinity, ease: "easeOut", delay: 0.5 }}
-                className="absolute inset-0 bg-blue-500/30 rounded-3xl z-[-1]"
+                className="absolute inset-0 bg-blue-500/30 rounded-full z-[-1]"
               />
             </motion.div>
 

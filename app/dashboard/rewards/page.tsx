@@ -1,6 +1,7 @@
 'use client';
 
 import { Award, CheckCircle } from 'lucide-react';
+import Image from 'next/image';
 import { useSession } from 'next-auth/react';
 import { useRef } from 'react';
 import CertificateActions from '@/components/CertificateActions';
@@ -95,8 +96,13 @@ export default function RewardsPage() {
                 {/* Certificate Badge */}
                 <div className="mb-6 text-center">
                   <div className="inline-block relative">
-                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg">
-                      <span className="text-3xl">★</span>
+                    <div className="w-24 h-24 rounded-full overflow-hidden shadow-lg relative bg-white">
+                      <Image 
+                        src="/logo.png" 
+                        alt="TeamForge Seal" 
+                        fill
+                        className="object-cover"
+                      />
                     </div>
                     <div className="absolute inset-0 rounded-full border-2 border-amber-300 animate-spin" style={{ animationDuration: '20s' }} />
                   </div>
