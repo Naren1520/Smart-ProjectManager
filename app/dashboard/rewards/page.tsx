@@ -1,54 +1,21 @@
 'use client';
 
-import { Award, CheckCircle, Download } from 'lucide-react';
+import { Award, CheckCircle } from 'lucide-react';
+import { useSession } from 'next-auth/react';
+import { useRef } from 'react';
+import CertificateActions from '@/components/CertificateActions';
 
 export default function RewardsPage() {
   const points = 350;
+  const { data: session } = useSession();
+  const certificateRef = useRef<HTMLDivElement>(null);
 
-  const downloadCertificate = async () => {
-    // @ts-ignore
-    const { jsPDF } = await import('jspdf/dist/jspdf.umd.min.js');
-    const doc = new jsPDF({
-      orientation: 'landscape',
-      unit: 'px',
-      format: [800, 600]
-    });
-
-    // Background
-    doc.setFillColor(243, 244, 246);
-    doc.rect(0, 0, 800, 600, 'F');
-
-    // Branding
-    doc.setFontSize(36);
-    doc.setTextColor(37, 99, 235);
-    doc.text('TeamForge AI', 400, 100, { align: 'center' });
-
-    // Title
-    doc.setFontSize(48);
-    doc.setTextColor(17, 24, 39);
-    doc.text('CERTIFICATE OF ACCOMPLISHMENT', 400, 200, { align: 'center' });
-
-    // Name
-    doc.setFontSize(24);
-    doc.setTextColor(55, 65, 81);
-    doc.text('Presented to', 400, 260, { align: 'center' });
-
-    doc.setFontSize(40);
-    doc.setTextColor(17, 24, 39);
-    doc.text('John Doe', 400, 320, { align: 'center' }); // Replace with user.name
-
-    // Achievement
-    doc.setFontSize(20);
-    doc.setTextColor(75, 85, 99);
-    doc.text('For successfully completing 10 AI-assisted tasks', 400, 380, { align: 'center' });
-
-    // Footer
-    doc.setFontSize(16);
-    doc.setTextColor(156, 163, 175);
-    doc.text(`Issued by TeamForge AI • ${new Date().toLocaleDateString()}`, 400, 500, { align: 'center' });
-
-    doc.save('TeamForge-Certificate.pdf');
-  };
+  const userName = session?.user?.name || 'Certificate Holder';
+  const currentDate = new Date().toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
 
   return (
     <div className="p-8 max-w-4xl mx-auto">
@@ -88,19 +55,117 @@ export default function RewardsPage() {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-neutral-900 rounded-3xl p-8 border border-neutral-200 dark:border-neutral-800 shadow-sm text-center">
-        <Award className="w-16 h-16 mx-auto text-blue-500 mb-6" />
-        <h2 className="text-2xl font-bold mb-2">Claim Your Certificate</h2>
-        <p className="text-neutral-500 mb-8 max-w-md mx-auto">
-            You've reached a milestone! Download your personalized AI-generated certificate to showcase your skills.
-        </p>
-        <button 
-            onClick={downloadCertificate}
-            className="px-8 py-3 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-full font-medium shadow-lg hover:shadow-xl hover:scale-105 transition-all flex items-center gap-2 mx-auto"
-        >
-            <Download className="w-5 h-5" />
-            Download Certificate
-        </button>
+      <div className="bg-white dark:bg-neutral-900 rounded-3xl p-8 border border-neutral-200 dark:border-neutral-800 shadow-sm text-center mb-8">
+        <h2 className="text-2xl font-bold mb-6">Your Certificate</h2>
+        
+        {/* Certificate Container */}
+        <div className="mb-8 flex justify-center">
+          <div
+            ref={certificateRef}
+            data-certificate
+            className="relative"
+            style={{
+              width: '100%',
+              maxWidth: '1000px',
+              aspectRatio: '4 / 3',
+              minHeight: '750px',
+            }}
+          >
+            {/* Outer Border */}
+            <div className="absolute inset-0 border-4 border-amber-600 rounded-lg shadow-2xl bg-white overflow-hidden">
+              {/* Decorative Top Border */}
+              <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-amber-100 to-transparent opacity-50" />
+
+              {/* Decorative Corners */}
+              <div className="absolute top-4 left-4 w-16 h-16 border-t-2 border-l-2 border-amber-600 rounded-tl-lg" />
+              <div className="absolute top-4 right-4 w-16 h-16 border-t-2 border-r-2 border-amber-600 rounded-tr-lg" />
+              <div className="absolute bottom-4 left-4 w-16 h-16 border-b-2 border-l-2 border-amber-600 rounded-bl-lg" />
+              <div className="absolute bottom-4 right-4 w-16 h-16 border-b-2 border-r-2 border-amber-600 rounded-br-lg" />
+
+              {/* Decorative Side Elements */}
+              <div className="absolute left-8 top-1/2 transform -translate-y-1/2 text-amber-200 opacity-40">
+                <div className="text-6xl">✦</div>
+              </div>
+              <div className="absolute right-8 top-1/2 transform -translate-y-1/2 text-amber-200 opacity-40">
+                <div className="text-6xl">✦</div>
+              </div>
+
+              {/* Main Content */}
+              <div className="flex flex-col items-center justify-center h-full px-12 py-8 relative z-10">
+                {/* Certificate Badge */}
+                <div className="mb-6 text-center">
+                  <div className="inline-block relative">
+                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg">
+                      <span className="text-3xl">★</span>
+                    </div>
+                    <div className="absolute inset-0 rounded-full border-2 border-amber-300 animate-spin" style={{ animationDuration: '20s' }} />
+                  </div>
+                </div>
+
+                {/* Title */}
+                <h2 className="text-5xl font-bold text-amber-900 mb-2 text-center tracking-wide">
+                  CERTIFICATE
+                </h2>
+                <h3 className="text-2xl text-amber-700 mb-8 font-semibold">
+                  of Excellence
+                </h3>
+
+                {/* Divider */}
+                <div className="w-32 h-1 bg-gradient-to-r from-transparent via-amber-600 to-transparent mb-8" />
+
+                {/* Content Section */}
+                <div className="text-center mb-8 flex-grow flex flex-col justify-center">
+                  <p className="text-gray-700 mb-4 text-lg">This is proudly presented to</p>
+
+                  {/* User Name - Main Focus */}
+                  <div className="mb-6">
+                    <p className="text-4xl font-bold text-amber-900 tracking-wide mb-1">
+                      {userName}
+                    </p>
+                    <div className="w-40 h-0.5 bg-amber-600 mx-auto" />
+                  </div>
+
+                  {/* Achievement Text */}
+                  <p className="text-gray-700 text-base max-w-lg mx-auto leading-relaxed">
+                    For outstanding achievement and dedication to excellence in mastering advanced project management skills and demonstrating exceptional leadership qualities within the TeamForge platform.
+                  </p>
+                </div>
+
+                {/* Divider */}
+                <div className="w-32 h-1 bg-gradient-to-r from-transparent via-amber-600 to-transparent mb-8" />
+
+                {/* Footer Information */}
+                <div className="flex justify-between items-end w-full px-8 py-4">
+                  {/* Date */}
+                  <div className="text-center flex-1">
+                    <p className="text-sm text-gray-600 mb-1">Date</p>
+                    <p className="text-gray-800 font-semibold border-b border-gray-800 pb-1">
+                      {currentDate}
+                    </p>
+                  </div>
+
+                  {/* Seal/Badge */}
+                  <div className="flex-1 flex justify-center">
+                    <div className="w-20 h-20 rounded-full border-4 border-amber-600 flex items-center justify-center bg-amber-50">
+                      <span className="text-2xl text-amber-600">TF</span>
+                    </div>
+                  </div>
+
+                  {/* Signature Line */}
+                  <div className="text-center flex-1">
+                    <p className="text-sm text-gray-600 mb-1">Authorized By</p>
+                    <p className="text-gray-800 font-semibold border-b border-gray-800 pb-1">
+                      TeamForge
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <CertificateActions userName={userName} />
       </div>
     </div>
   );
