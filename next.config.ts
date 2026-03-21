@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "github.com" },
     ],
   },
+  turbopack: {},
 };
 
 export default nextConfig;

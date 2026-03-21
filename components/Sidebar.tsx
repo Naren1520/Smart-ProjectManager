@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Users, FolderKanban, MessageSquare, Video, FileText, Settings, Award, Sparkles } from 'lucide-react';
+import { LayoutDashboard, Users, FolderKanban, MessageSquare, Video, FileText, Settings, Award, Sparkles, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils'; // I need to create lib/utils still
 
 export const links = [
@@ -14,6 +14,7 @@ export const links = [
   { href: '/dashboard/meet', label: 'Meeting', icon: Video },
   { href: '/dashboard/docs', label: 'Docs', icon: FileText },
   { href: '/dashboard/rewards', label: 'Rewards', icon: Award },
+  { href: '/dashboard/certificate', label: 'Certificate', icon: Trophy },
 ];
 
 export function Sidebar() {
