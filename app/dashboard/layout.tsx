@@ -1,4 +1,5 @@
 import { Sidebar } from '@/components/Sidebar';
+import { MobileSidebar } from '@/components/MobileSidebar'; // Import MobileSidebar
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
@@ -22,10 +23,11 @@ export default async function DashboardLayout({
   return (
     <div className="flex h-screen overflow-hidden bg-neutral-50 dark:bg-neutral-950">
       <Sidebar />
-      <div className="flex-1 flex flex-col justify-between overflow-y-auto">
-        <header className="sticky top-0 z-10 flex h-16 w-full items-center justify-between border-b bg-white/50 px-6 backdrop-blur-xl dark:bg-black/50 border-neutral-200 dark:border-neutral-800">
+      <div className="flex-1 flex flex-col justify-between overflow-y-auto w-full relative">
+        <header className="sticky top-0 z-10 flex h-16 w-full items-center justify-between border-b bg-white/50 px-4 md:px-6 backdrop-blur-xl dark:bg-black/50 border-neutral-200 dark:border-neutral-800">
           <div className="flex items-center gap-4">
-            <h1 className="text-xl font-semibold opacity-0 md:opacity-100 transition-opacity">
+            <MobileSidebar />
+            <h1 className="text-xl font-semibold opacity-100 transition-opacity">
               Dashboard
             </h1>
           </div>
@@ -49,7 +51,7 @@ export default async function DashboardLayout({
             </div>
           </div>
         </header>
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-4 md:p-6 w-full max-w-[100vw] overflow-x-hidden">
           {children}
         </main>
       </div>

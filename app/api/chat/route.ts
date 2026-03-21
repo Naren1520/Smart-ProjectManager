@@ -47,7 +47,38 @@ export async function POST(req: NextRequest) {
   });
   await userMsg.save();
 
-  // AI Logic Simulation
+  // Integrated Gemini AI Logic
+  try {
+    // Fetch recent context (last 5 messages)
+    const contextMsgs = await Message.find({ team: teamId })
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .populate('sender', 'name');
+    
+    // Reverse because we fetched descending
+    const context = contextMsgs.reverse().map(m => `${m.sender.name}: ${m.content}`).join('\n');
+
+    const { chatWithAI } = await import('@/lib/gemini');
+    const aiResponse = await chatWithAI(content, context);
+    
+    // Save AI response
+    const aiMsg = new Message({
+      content: aiResponse,
+      sender: null, // System/AI
+      team: teamId,
+      isAI: true,
+      createdAt: new Date(),
+    });
+
+    await aiMsg.save();
+    
+    return NextResponse.json({ userMsg, aiMsg });
+
+  } catch (error) {
+    console.error("AI Generation Error:", error);
+    // Don't fail the request if AI fails, just return user message
+    return NextResponse.json({ userMsg });
+  }
   // Simple heuristic: if message asks for "plan", "task", "assign", or contains "project"
   const msgLower = content.toLowerCase();
   let aiResponseContent = "";
