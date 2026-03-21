@@ -1,12 +1,12 @@
 'use client';
 
-import { jsPDF } from 'jspdf';
 import { Award, CheckCircle, Download } from 'lucide-react';
 
 export default function RewardsPage() {
   const points = 350;
 
-  const downloadCertificate = () => {
+  const downloadCertificate = async () => {
+    const { jsPDF } = await import('jspdf');
     const doc = new jsPDF({
       orientation: 'landscape',
       unit: 'px',
