@@ -1,7 +1,6 @@
 # TeamForge AI 
 
 ![TeamForge Banner](./public/logo.png) 
-*(Replace this with a screenshot or banner of your app)*
 
 **TeamForge AI** is an intelligent, full-stack project management platform designed to automate team formation, task allocation, and skill development using the power of Generative AI. Built for the modern hackathon spirit, it transforms how teams collaborate, learn, and succeed.
 
