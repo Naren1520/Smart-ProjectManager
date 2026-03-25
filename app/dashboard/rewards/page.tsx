@@ -19,6 +19,7 @@ interface RewardsData {
   points: number;
   level: number;
   badges: Badge[];
+  name?: string;
 }
 
 export default function RewardsPage() {
@@ -29,6 +30,8 @@ export default function RewardsPage() {
 
   useEffect(() => {
     const fetchData = async () => {
+      // Fetch regardless of session, but we need session for auth context usually
+      // The API uses session to identify user, so we keep the check
       if (session?.user?.email) {
         try {
           const response = await fetch('/api/user/rewards');
@@ -47,7 +50,7 @@ export default function RewardsPage() {
     fetchData();
   }, [session]);
 
-  const userName = session?.user?.name || 'Certificate Holder';
+  const userName = data?.name || session?.user?.name || 'Certificate Holder';
   const currentDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',

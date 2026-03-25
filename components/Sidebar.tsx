@@ -2,11 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Users, FolderKanban, MessageSquare, Video, FileText, Settings, Award, Sparkles } from 'lucide-react';
+import { LayoutDashboard, Users, FolderKanban, MessageSquare, Video, FileText, Settings, Award, Sparkles, UserCircle } from 'lucide-react';
 import { cn } from '@/lib/utils'; // I need to create lib/utils still
 
 export const links = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/dashboard/profile', label: 'Public Profile', icon: UserCircle },
   { href: '/dashboard/ai-tools', label: 'AI Tools', icon: Sparkles },
   { href: '/dashboard/teams', label: 'Teams', icon: Users },
   { href: '/dashboard/projects', label: 'Projects', icon: FolderKanban },

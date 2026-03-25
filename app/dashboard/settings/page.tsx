@@ -2,14 +2,24 @@
 
 import { useSession, signOut } from 'next-auth/react';
 import { useTheme } from 'next-themes';
-import { User, Bell, Shield, LogOut, Sun, Moon, Laptop, Mail, MessageSquare } from 'lucide-react';
+import { User, Bell, Shield, LogOut, Sun, Moon, Laptop, Mail, MessageSquare, Github } from 'lucide-react';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 
 export default function SettingsPage() {
   const { data: session } = useSession();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
+
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    bio: '',
+    githubUsername: ''
+  });
 
   // Mock notification settings
   const [notifications, setNotifications] = useState({
@@ -18,7 +28,57 @@ export default function SettingsPage() {
     marketing: false
   });
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    setMounted(true);
+    fetchUserData();
+  }, [session]);
+
+  const fetchUserData = async () => {
+    if (!session?.user?.email) return;
+    try {
+      const res = await fetch('/api/user/me');
+      if (res.ok) {
+        const data = await res.json();
+        setFormData({
+            name: data.name || '',
+            email: data.email || '',
+            bio: data.bio || '',
+            githubUsername: data.githubProfile?.username || ''
+        });
+      }
+    } catch (error) {
+      console.error("Failed to fetch user settings", error);
+    } finally {
+        setFetching(false);
+    }
+  };
+
+  const handleSave = async () => {
+    setLoading(true);
+    try {
+        const res = await fetch('/api/user/me', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                name: formData.name,
+                bio: formData.bio,
+                githubUsername: formData.githubUsername
+            })
+        });
+
+        if (res.ok) {
+            toast.success("Settings updated successfully");
+            // Optionally reload to reflect changes globally if needed, 
+            // but for now local state is enough.
+        } else {
+            toast.error("Failed to update settings");
+        }
+    } catch (error) {
+        toast.error("Something went wrong");
+    } finally {
+        setLoading(false);
+    }
+  };
 
   if (!mounted) return null;
 
@@ -62,7 +122,8 @@ export default function SettingsPage() {
                 <label className="text-sm font-medium text-neutral-500">Full Name</label>
                 <input 
                   type="text" 
-                  defaultValue={session?.user?.name || ''} 
+                  value={formData.name}
+                  onChange={(e) => setFormData({...formData, name: e.target.value})}
                   className="w-full bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500/50 outline-none"
                 />
               </div>
@@ -70,23 +131,44 @@ export default function SettingsPage() {
                 <label className="text-sm font-medium text-neutral-500">Email Address</label>
                 <input 
                   type="email" 
-                  defaultValue={session?.user?.email || ''} 
+                  value={formData.email} 
                   disabled
                   className="w-full bg-neutral-100 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700 rounded-lg px-4 py-2 text-neutral-500 cursor-not-allowed"
                 />
               </div>
             </div>
+
+            <div className="space-y-2">
+                <label className="text-sm font-medium text-neutral-500 flex items-center gap-2">
+                    <Github className="w-4 h-4" />
+                    GitHub Username
+                </label>
+                <input 
+                  type="text" 
+                  value={formData.githubUsername}
+                  onChange={(e) => setFormData({...formData, githubUsername: e.target.value})}
+                  placeholder="e.g. torvalds"
+                  className="w-full bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500/50 outline-none"
+                />
+                <p className="text-xs text-neutral-500">Updating this will refresh your skill analysis based on your public repos.</p>
+            </div>
+
             <div className="space-y-2">
               <label className="text-sm font-medium text-neutral-500">Bio</label>
               <textarea 
                 className="w-full bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500/50 outline-none h-24 resize-none"
                 placeholder="Tell us a bit about yourself..."
-                defaultValue="Product Manager passionate about AI and efficient workflows."
+                value={formData.bio}
+                onChange={(e) => setFormData({...formData, bio: e.target.value})}
               />
             </div>
             <div className="flex justify-end">
-              <button className="bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 px-4 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity">
-                Save Changes
+              <button 
+                onClick={handleSave}
+                disabled={loading || fetching}
+                className="bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 px-6 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? 'Saving...' : 'Save Changes'}
               </button>
             </div>
           </div>

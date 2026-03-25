@@ -2,12 +2,27 @@
 
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Settings } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { links } from './Sidebar'; // Importing shared links configuration
+// import { links } from './Sidebar'; // Importing shared links configuration
+
+// Re-defining directly to include icon component type
+import { LayoutDashboard, Users, FolderKanban, MessageSquare, Video, FileText, Award, Sparkles, UserCircle } from 'lucide-react';
+
+const links = [
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/dashboard/profile', label: 'Public Profile', icon: UserCircle },
+  { href: '/dashboard/ai-tools', label: 'AI Tools', icon: Sparkles },
+  { href: '/dashboard/teams', label: 'Teams', icon: Users },
+  { href: '/dashboard/projects', label: 'Projects', icon: FolderKanban },
+  { href: '/dashboard/chat', label: 'AI Chat', icon: MessageSquare },
+  { href: '/dashboard/meet', label: 'Meeting', icon: Video },
+  { href: '/dashboard/docs', label: 'Docs', icon: FileText },
+  { href: '/dashboard/rewards', label: 'Rewards', icon: Award },
+];
 
 export function MobileSidebar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -81,6 +96,22 @@ export function MobileSidebar() {
                       </Link>
                     );
                   })}
+                  
+                  <div className="h-px bg-neutral-200 dark:bg-neutral-800 my-2 mx-4" />
+                  
+                  <Link
+                    href="/dashboard/settings"
+                    onClick={() => setIsOpen(false)}
+                    className={cn(
+                      "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group",
+                      pathname === '/dashboard/settings'
+                        ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30" 
+                        : "hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-600 dark:text-neutral-400"
+                    )}
+                  >
+                    <Settings className={cn("w-5 h-5", pathname === '/dashboard/settings' ? "text-white" : "text-neutral-500 group-hover:text-neutral-900 dark:group-hover:text-neutral-200")} />
+                    <span className="font-medium">Settings</span>
+                  </Link>
                 </nav>
               </motion.div>
             </>

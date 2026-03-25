@@ -1,11 +1,28 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 import { Bot, FileText, Briefcase, Loader2, Sparkles, User, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function AIToolsPage() {
+  const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState<'tasks' | 'resume'>('tasks');
+  const [currentUser, setCurrentUser] = useState<any>(null);
+
+  // Fetch current user skills on mount
+  useEffect(() => {
+    if (session?.user?.email) {
+      fetch('/api/user/me')
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.email) {
+            setCurrentUser(data);
+          }
+        })
+        .catch(err => console.error("Error fetching user data", err));
+    }
+  }, [session]);
 
   // Task Generator State
   const [projectDesc, setProjectDesc] = useState('');
@@ -22,26 +39,42 @@ export default function AIToolsPage() {
     if (!projectDesc.trim()) return;
     setIsGeneratingTasks(true);
     setTasks([]);
+
+    // Get current user skills or defaults
+    const userSkills = currentUser?.skills || [];
+    const githubLangs = currentUser?.githubProfile?.topLanguages || [];
+    const allSkills = Array.from(new Set([...userSkills, ...githubLangs]));
+
+    const teamMembers = [
+      { 
+        name: currentUser?.name || "You", 
+        role: "Team Lead / Developer", 
+        skills: allSkills.length > 0 ? allSkills : ["Project Management"] 
+      },
+      { name: "John Doe", role: "Frontend Dev", skills: ["React", "CSS", "TypeScript"] },
+      { name: "Jane Smith", role: "Backend Dev", skills: ["Node.js", "MongoDB", "Python"] },
+    ];
+
     try {
       const res = await fetch('/api/tasks/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           message: projectDesc,
-          teamMembers: [
-            { name: "John Doe", role: "Frontend Dev", skills: ["React", "CSS"] },
-            { name: "Jane Smith", role: "Backend Dev", skills: ["Node.js", "MongoDB"] },
-            { name: "Mike Johnson", role: "Designer", skills: ["Figma", "UI/UX"] }
-          ] // Mock team members for now
+          teamMembers: teamMembers
         }),
       });
       const data = await res.json();
       if (Array.isArray(data)) {
         setTasks(data);
       } else if (data.tasks) {
-        setTasks(data.tasks);
+        setTasks(data.tasks); // Handle case where API returns { tasks: [] }
+      } else if (data.message) {
+        // Error message
+        console.error("Error from API:", data.message);
       } else {
         console.error("Unexpected task format:", data);
+        // Fallback for raw string if needed, currently just empty
       }
     } catch (error) {
       console.error("Failed to generate tasks:", error);

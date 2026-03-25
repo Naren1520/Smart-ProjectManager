@@ -1,12 +1,14 @@
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { SkillMap } from "@/components/SkillMap";
-import { FolderKanban, TrendingUp, CheckCircle, Clock } from "lucide-react";
+import { FolderKanban, TrendingUp, CheckCircle, Clock, Github, GitBranch, Users } from "lucide-react";
 import Link from 'next/link';
 import dbConnect from "@/lib/mongodb";
 import User from "@/models/User";
 import Project from "@/models/Project";
 import Team from "@/models/Team";
+import { getGithubProfile, getGithubLanguages } from "@/lib/github";
+import Image from "next/image";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
@@ -21,6 +23,18 @@ export default async function DashboardPage() {
   const user = await User.findOne({ email: session.user.email });
   if (!user) {
     return <div className="p-8 text-center text-red-500">User profile not found.</div>;
+  }
+
+  // Fetch GitHub Details if linked
+  let githubStats = null;
+  let githubLanguages: string[] = [];
+  if (user.githubProfile?.username) {
+     try {
+       githubStats = await getGithubProfile(user.githubProfile.username);
+       githubLanguages = await getGithubLanguages(user.githubProfile.username);
+     } catch (e) {
+       console.error("Failed to fetch Github data", e);
+     }
   }
 
   // Fetch projects associated with user's teams
@@ -60,10 +74,9 @@ export default async function DashboardPage() {
 
   const efficiency = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
   
-  // Skills Data (using real user skills)
-  // Assuming skills are stored as strings in user.skills
-  // We mock the scores for now as they aren't in the schema, or maybe map them if they exist
-  const userSkills = (user.skills && user.skills.length > 0) ? user.skills.map((s: string) => ({
+  // Skills Data (using real user skills + live github languages)
+  const allSkills = Array.from(new Set([...(user.skills || []), ...githubLanguages]));
+  const userSkills = (allSkills.length > 0) ? allSkills.map((s: string) => ({
     subject: s, 
     A: 80 + Math.floor(Math.random() * 20), // Placeholder score until we have assessments
     fullMark: 100
@@ -115,11 +128,100 @@ export default async function DashboardPage() {
 
       {/* Skills Radar */}
       <div className="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-2xl p-6 shadow-sm flex flex-col">
-        <h3 className="text-lg font-semibold mb-4">Skill Profile</h3>
-        <div className="flex-1 flex items-center justify-center">
-            <SkillMap data={userSkills} />
-        </div>
+          <h3 className="text-lg font-semibold mb-4">Skill Profile</h3>
+          <div className="flex-1 flex items-center justify-center">
+              <SkillMap data={userSkills} />
+          </div>
       </div>
+
+      {/* GitHub Detailed Stats */}
+      {user.githubProfile?.username && (
+          <div className="col-span-full md:col-span-2 lg:col-span-3 bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-2xl p-6 shadow-sm overflow-hidden">
+             <div className="flex items-center justify-between mb-6">
+                <h3 className="font-bold text-lg flex items-center gap-2">
+                    <Github className="w-6 h-6 text-neutral-900 dark:text-white" />
+                    GitHub Activity & Stats
+                </h3>
+                {user.githubProfile.username && (
+                  <Link href={`https://github.com/${user.githubProfile.username}`} target="_blank" className="flex items-center gap-1 text-sm text-blue-500 hover:underline">
+                    View Profile
+                    <TrendingUp className="w-3 h-3" />
+                  </Link>
+                )}
+             </div>
+
+             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                 <div className="p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl border border-neutral-100 dark:border-neutral-800 flex items-center gap-3">
+                    <div className="p-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-lg">
+                      <FolderKanban className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <div className="text-neutral-500 text-xs mb-1">Public Repos</div>
+                      <div className="text-xl font-bold">{githubStats?.public_repos || user.githubProfile.repoCount || '-'}</div>
+                    </div>
+                 </div>
+                 <div className="p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl border border-neutral-100 dark:border-neutral-800 flex items-center gap-3">
+                    <div className="p-2 bg-purple-100 dark:bg-purple-900/30 text-purple-600 rounded-lg">
+                      <Users className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <div className="text-neutral-500 text-xs mb-1">Followers</div>
+                      <div className="text-xl font-bold">{githubStats?.followers || '-'}</div>
+                    </div>
+                 </div>
+                 <div className="p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl border border-neutral-100 dark:border-neutral-800 flex items-center gap-3">
+                    <div className="p-2 bg-green-100 dark:bg-green-900/30 text-green-600 rounded-lg">
+                      <CheckCircle className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <div className="text-neutral-500 text-xs mb-1">Following</div>
+                      <div className="text-xl font-bold">{githubStats?.following || '-'}</div>
+                    </div>
+                 </div>
+                 <div className="p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl border border-neutral-100 dark:border-neutral-800 flex items-center gap-3">
+                    <div className="p-2 bg-amber-100 dark:bg-amber-900/30 text-amber-600 rounded-lg">
+                      <Clock className="w-5 h-5" />
+                    </div>
+                    <div>
+                       <div className="text-neutral-500 text-xs mb-1">Joined</div>
+                       <div className="text-sm font-bold">Member since {new Date(user.createdAt).getFullYear()}</div>
+                    </div>
+                 </div>
+             </div>
+
+             <div className="space-y-6">
+               <div className="bg-neutral-50 dark:bg-neutral-950/50 p-4 rounded-xl border border-neutral-100 dark:border-neutral-800">
+                  <div className="text-sm font-medium mb-4 text-neutral-500 flex items-center gap-2">
+                    <GitBranch className="w-4 h-4" />
+                    Contributions Graph
+                  </div>
+                  <div className="w-full overflow-x-auto pb-2 scrollbar-hide">
+                      {/* Using github-readme-activity-graph as it is more reliable for real-time fetch */}
+                     <img 
+                       src={`https://github-readme-activity-graph.vercel.app/graph?username=${user.githubProfile.username}&theme=react-dark-high-contrast&hide_border=true&area=true`} 
+                       alt="GitHub Contributions"
+                       className="w-full min-w-[700px] dark:opacity-90" 
+                     />
+                  </div>
+               </div>
+               
+               <div>
+                 <div className="text-sm font-medium mb-3 text-neutral-500">Languages Used</div>
+                 <div className="flex flex-wrap gap-2">
+                   {githubLanguages.length > 0 ? (
+                      githubLanguages.map((lang: string) => (
+                        <span key={lang} className="px-3 py-1.5 bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 text-xs rounded-lg font-medium border border-neutral-200 dark:border-neutral-700 shadow-sm">
+                          {lang}
+                        </span>
+                      ))
+                   ) : (
+                      <span className="text-xs text-neutral-400 italic">No languages detected</span>
+                   )}
+                 </div>
+               </div>
+             </div>
+          </div>
+      )}
     
       {/* Recent Activity */}
       <div className="col-span-full bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-2xl p-6 shadow-sm">

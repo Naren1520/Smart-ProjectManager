@@ -11,7 +11,7 @@ export function OnboardingForm() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const [formData, setFormData] = useState({
-    githubUsername: '',
+    githubLink: '',
     role: 'Member',
     bio: '',
     skills: [] as string[],
@@ -20,6 +20,10 @@ export function OnboardingForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (step < 3) {
+      if (step === 1 && !formData.githubLink) {
+        toast.error("Please enter your GitHub profile link");
+        return;
+      }
       setStep(step + 1);
       return;
     }
@@ -32,6 +36,7 @@ export function OnboardingForm() {
         body: JSON.stringify(formData),
         headers: { 'Content-Type': 'application/json' },
       });
+
       
       if (response.ok) {
         toast.success("Profile Analyzed & Created!");
@@ -39,7 +44,7 @@ export function OnboardingForm() {
       } else {
         toast.error("Failed to update profile");
       }
-    } catch (error) {
+    } catch {
       toast.error("Something went wrong");
     } finally {
       setLoading(false);
@@ -76,20 +81,20 @@ export function OnboardingForm() {
               className="space-y-4"
             >
               <div>
-                <label className="block text-sm font-medium mb-2 text-neutral-700 dark:text-neutral-300">GitHub Content</label>
+                <label className="block text-sm font-medium mb-2 text-neutral-700 dark:text-neutral-300">GitHub Profile Link</label>
                 <div className="relative">
                   <Github className="absolute left-4 top-3.5 w-5 h-5 text-neutral-400" />
                   <input
-                    type="text"
+                    type="url"
                     required
-                    placeholder="github-username"
-                    value={formData.githubUsername}
-                    onChange={e => setFormData({ ...formData, githubUsername: e.target.value })}
+                    placeholder="https://github.com/username"
+                    value={formData.githubLink}
+                    onChange={e => setFormData({ ...formData, githubLink: e.target.value })}
                     className="w-full pl-12 pr-4 py-3 rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
                   />
                 </div>
                 <p className="text-xs text-neutral-500 mt-2">
-                  We'll analyze your repositories to suggest skills automatically.
+                  We&apos;ll analyze your repositories to suggest skills automatically.
                 </p>
               </div>
             </motion.div>

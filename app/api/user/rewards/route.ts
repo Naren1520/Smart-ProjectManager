@@ -68,7 +68,8 @@ export async function GET() {
     return NextResponse.json({
       points: user.points,
       level: user.level,
-      badges: user.badges
+      badges: user.badges,
+      name: user.name
     });
 
   } catch (error) {
