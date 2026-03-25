@@ -6,12 +6,13 @@ import Project from "@/models/Project";
 import { getGithubProfile, getGithubLanguages } from "@/lib/github";
 import { SkillMap } from "@/components/SkillMap";
 
-export default async function PublicProfilePage({ params }: { params: { uniqueId: string } }) {
+export default async function PublicProfilePage({ params }: { params: Promise<{ uniqueId: string }> }) {
+  const { uniqueId } = await params;
   await dbConnect();
 
   // 1. Fetch User by uniqueId (Case insensitive)
   const user = await User.findOne({ 
-    uniqueId: { $regex: new RegExp(`^${params.uniqueId}$`, 'i') } 
+    uniqueId: { $regex: new RegExp(`^${uniqueId}$`, 'i') } 
   }).lean();
 
   if (!user) {

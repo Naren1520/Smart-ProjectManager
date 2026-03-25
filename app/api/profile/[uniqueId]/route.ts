@@ -4,9 +4,9 @@ import User from '@/models/User';
 import Project from '@/models/Project';
 import { getGithubProfile, getGithubLanguages } from '@/lib/github';
 
-export async function GET(req: Request, { params }: { params: { uniqueId: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ uniqueId: string }> }) {
   try {
-    const { uniqueId } = params;
+    const { uniqueId } = await params;
     await dbConnect();
     
     // Find user by uniqueId
