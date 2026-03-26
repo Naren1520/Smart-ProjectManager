@@ -7,7 +7,7 @@ import User from '@/models/User';
 
 export async function POST(
   req: Request,
-  { params }: { params: { teamId: string } }
+  { params }: { params: Promise<{ teamId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
