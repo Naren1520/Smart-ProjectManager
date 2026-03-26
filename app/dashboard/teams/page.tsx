@@ -6,6 +6,9 @@ import Team from "@/models/Team";
 import { redirect } from "next/navigation";
 import TeamsClient from "./TeamsClient";
 
+// Force model registration to prevent tree-shaking
+const _TeamModel = Team;
+
 export default async function TeamsPage() {
   const session = await getServerSession(authOptions);
 

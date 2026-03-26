@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
+import { Loader } from '@/components/Loader';
 
 interface Team {
     _id: string;
@@ -103,11 +104,7 @@ export default function TeamDetailsPage({ params }: { params: Promise<{ teamId: 
     const amILeader = currentUserRole === 'Leader';
 
     if (loading) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            </div>
-        );
+        return <Loader />;
     }
 
     if (!team) return <div>Team not found</div>;

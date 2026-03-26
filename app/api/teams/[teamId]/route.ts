@@ -33,6 +33,31 @@ export async function GET(
       return NextResponse.json({ message: 'Team not found' }, { status: 404 });
     }
 
+    // Generate uniqueId for team if missing (Backfill for existing teams)
+    if (!team.uniqueId) {
+      try {
+        const leaderMember = team.members.find((m: any) => m.role === 'Leader');
+        // leaderMember.user is populated with uniqueId
+        let leaderIdCode = leaderMember?.user?.uniqueId;
+
+        // Fallback or generate random if leader implementation is missing
+        if (!leaderIdCode) {
+           leaderIdCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+        }
+
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let randomPart = '';
+        for (let i = 0; i < 6; i++) {
+             randomPart += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        
+        team.uniqueId = `${leaderIdCode}-${randomPart}`;
+        await team.save();
+      } catch (err) {
+        console.error("Failed to auto-generate uniqueId for team:", err);
+      }
+    }
+
     // Authorization check: Is the user a member?
     // We need to map team members correctly because population changes structure slightly
     // Original: members: [{ user: ObjectId, role: String }]

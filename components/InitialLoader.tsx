@@ -60,6 +60,7 @@ export function InitialLoader() {
                   src="/logo.png" 
                   alt="TeamForge AI Logo" 
                   fill
+                  sizes="128px"
                   className="object-cover"
                   priority
                 />

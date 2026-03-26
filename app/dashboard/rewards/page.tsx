@@ -161,6 +161,7 @@ export default function RewardsPage() {
                         src="/logo.png" 
                         alt="TeamForge Seal" 
                         fill
+                        sizes="96px"
                         className="object-cover"
                       />
                     </div>
