@@ -36,3 +36,41 @@ export async function GET(
     return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
   }
 }
+export async function POST(
+  req: Request,
+  { params }: { params: Promise<{ teamId: string }> }
+) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user?.email) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { teamId } = await params;
+    const { title, description } = await req.json();
+
+    if (!title) {
+      return NextResponse.json({ message: 'Title is required' }, { status: 400 });
+    }
+
+    await dbConnect();
+    
+    // Validate team exists
+    const team = await Team.findById(teamId);
+    if (!team) {
+       return NextResponse.json({ message: 'Team not found' }, { status: 404 });
+    }
+
+    const newProject = await Project.create({
+      title,
+      description,
+      team: teamId,
+      status: 'Planning'
+    });
+
+    return NextResponse.json(newProject, { status: 201 });
+  } catch (error) {
+    console.error('Error creating team project:', error);
+    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+  }
+}
