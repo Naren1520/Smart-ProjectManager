@@ -26,7 +26,7 @@ const UserSchema = new mongoose.Schema({
   }],
   teams: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Team' }],
   createdAt: { type: Date, default: Date.now },
-  uniqueId: { type: String, unique: true }, // Short unique ID for sharing
+  uniqueId: { type: String, unique: true, sparse: true }, // Short unique ID for sharing
 });
 
 export default mongoose.models.User || mongoose.model('User', UserSchema);

@@ -9,6 +9,7 @@ const TeamSchema = new mongoose.Schema({
   }],
   projects: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Project' }],
   createdAt: { type: Date, default: Date.now },
+  uniqueId: { type: String, unique: true, sparse: true }, // Unique identifier for joining
 });
 
 export default mongoose.models.Team || mongoose.model('Team', TeamSchema);

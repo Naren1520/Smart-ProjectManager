@@ -4,7 +4,7 @@ import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { 
-    Users, Plus, Brain, Calendar, Clock, ArrowRight, UserPlus, FileText, CheckCircle, Trash2
+    Users, Plus, Brain, Calendar, Clock, ArrowRight, UserPlus, FileText, CheckCircle, Trash2, Copy
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
@@ -13,7 +13,8 @@ interface Team {
     _id: string;
     name: string;
     description: string;
-    members: { user: string; role: string }[];
+    uniqueId?: string;
+    members: { user: any; role: string }[];
 }
 
 interface Project {
@@ -201,6 +202,30 @@ export default function TeamDetailsPage({ params }: { params: Promise<{ teamId: 
                 {/* Sidebar: Members */}
                 <div className="space-y-6">
                     <div className="bg-white dark:bg-neutral-900 p-6 rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
+                        {/* Invite Code */}
+                        <div className="mb-6 p-4 bg-violet-50 dark:bg-violet-900/20 rounded-xl border border-violet-100 dark:border-violet-800">
+                            <p className="text-xs font-semibold text-violet-600 dark:text-violet-400 uppercase tracking-wider mb-1">
+                                Invite Code
+                            </p>
+                            <div className="flex items-center justify-between gap-2">
+                                <code className="text-lg font-mono font-bold text-neutral-800 dark:text-neutral-200">
+                                    {team.uniqueId || 'Generating...'}
+                                </code>
+                                <button 
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(team.uniqueId || '');
+                                        toast.success('Copied to clipboard');
+                                    }}
+                                    className="p-2 hover:bg-violet-200 dark:hover:bg-violet-800/50 rounded-lg transition-colors text-violet-600"
+                                    title="Copy Code"
+                                >
+                                    <Copy className="w-4 h-4" />
+                                </button>
+                            </div>
+                            <p className="text-[11px] text-neutral-500 mt-2 leading-relaxed">
+                                Share this with your team to check in.
+                            </p>
+                        </div>
                         <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
                             <Users className="w-5 h-5 text-green-500" />
                             Team Members

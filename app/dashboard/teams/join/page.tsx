@@ -61,7 +61,7 @@ export default function JoinTeamPage() {
                         required
                         value={code}
                         onChange={(e) => setCode(e.target.value)}
-                        placeholder="e.g. TF-AB12-CD34"
+                        placeholder="e.g. A1B2C3-X9Y8Z7"
                         className="w-full px-4 py-3 rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 outline-none focus:ring-2 focus:ring-violet-500 transition-all font-mono tracking-widest text-center text-lg uppercase"
                     />
                 </div>

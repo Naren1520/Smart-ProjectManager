@@ -21,8 +21,8 @@ export async function POST(req: Request) {
 
     await dbConnect();
 
-    // Check if team exists. For demo, we are assuming 'code' is just the Team ID.
-    const team = await Team.findById(code); // Or perform a findOne({ inviteCode: code })
+    // Check if team exists.
+    const team: any = await Team.findOne({ uniqueId: code });
     if (!team) {
       return NextResponse.json({ message: 'Team not found' }, { status: 404 });
     }

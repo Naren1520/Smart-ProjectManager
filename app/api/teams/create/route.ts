@@ -22,15 +22,35 @@ export async function POST(req: Request) {
     await dbConnect();
     
     // Find User ID
-    const user = await User.findOne({ email: session.user.email });
+    const user: any = await User.findOne({ email: session.user.email });
     if (!user) {
         return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
+
+    // Generate unique ID for user if not exists
+    if (!user.uniqueId) {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let result = '';
+      for (let i = 0; i < 6; i++) {
+          result += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      user.uniqueId = result;
+      await user.save();
+    }
+
+    // Generate Team Unique ID (LEADER_ID-RANDOM)
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let randomPart = '';
+    for (let i = 0; i < 6; i++) {
+        randomPart += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    const teamUniqueId = `${user.uniqueId}-${randomPart}`;
 
     // Create Team
     const newTeam = new Team({
       name,
       description,
+      uniqueId: teamUniqueId,
       members: [{ user: user._id, role: 'Leader' }],
     });
 
