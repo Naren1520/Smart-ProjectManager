@@ -16,6 +16,9 @@ export async function POST(
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
+    // Ensure params are awaited
+    const { teamId } = await params;
+
     const { uniqueId } = await req.json();
 
     if (!uniqueId) {
@@ -29,7 +32,6 @@ export async function POST(
         return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
 
-    const { teamId } = await params;
     const team = await Team.findById(teamId);
     if (!team) {
       return NextResponse.json({ message: 'Team not found' }, { status: 404 });
