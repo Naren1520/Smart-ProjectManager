@@ -5,6 +5,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import Image from 'next/image';
+import { GithubConnectModal } from '@/components/GithubConnectModal';
 
 export default async function DashboardLayout({
   children,
@@ -53,6 +54,7 @@ export default async function DashboardLayout({
         </header>
         <main className="flex-1 p-4 md:p-6 w-full max-w-[100vw] overflow-x-hidden">
           {children}
+          <GithubConnectModal />
         </main>
       </div>
     </div>

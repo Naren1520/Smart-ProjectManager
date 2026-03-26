@@ -24,8 +24,12 @@ export const authOptions: NextAuthOptions = {
               role: 'Member',
               experience: 0,
               points: 0,
+              uniqueId: (Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 6)).toUpperCase() // Ensure somewhat unique
             });
             await newUser.save();
+          } else if (!existingUser.uniqueId) {
+             existingUser.uniqueId = (Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 6)).toUpperCase();
+             await existingUser.save();
           }
           return true;
         } catch (error) {

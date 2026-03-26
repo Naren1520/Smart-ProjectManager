@@ -24,8 +24,9 @@ export default function CreateTeamPage() {
         });
 
         if (response.ok) {
+            const data = await response.json();
             toast.success("Team created successfully!");
-            router.push('/dashboard');
+            router.push(`/dashboard/teams/${data.teamId}/add-members`);
         } else {
             toast.error("Failed to create team. Check your connection.");
         }
