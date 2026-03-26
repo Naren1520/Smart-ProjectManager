@@ -35,6 +35,37 @@ export default function TeamDetailsPage({ params }: { params: Promise<{ teamId: 
     const [projects, setProjects] = useState<Project[]>([]);
     const [loading, setLoading] = useState(true);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [isCreateProjectModalOpen, setIsCreateProjectModalOpen] = useState(false);
+    const [newProject, setNewProject] = useState({ title: '', description: '' });
+    const [isCreatingProject, setIsCreatingProject] = useState(false);
+
+    const handleCreateProject = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsCreatingProject(true);
+        try {
+            const res = await fetch(`/api/teams/${teamId}/projects`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newProject),
+            });
+            if (res.ok) {
+                const project = await res.json();
+                setProjects([project, ...projects]);
+                setIsCreateProjectModalOpen(false);
+                setNewProject({ title: '', description: '' });
+                toast.success('Project created successfully');
+                router.push(`/dashboard/teams/${teamId}/projects/${project._id}`);
+            } else {
+                const data = await res.json();
+                toast.error(data.message || 'Failed to create project');
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error('An error occurred');
+        } finally {
+            setIsCreatingProject(false);
+        }
+    };
 
     // Check if current user is leader
     const isLeader = team?.members?.some((m: any) => 
@@ -122,7 +153,7 @@ export default function TeamDetailsPage({ params }: { params: Promise<{ teamId: 
                         <UserPlus className="w-4 h-4" />
                         Manage Members
                     </Link>
-                    <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20">
+                    <button onClick={() => setIsCreateProjectModalOpen(true)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20">
                         <Plus className="w-4 h-4" />
                         New Project
                     </button>
@@ -156,14 +187,14 @@ export default function TeamDetailsPage({ params }: { params: Promise<{ teamId: 
                             </div>
                             <h3 className="text-lg font-medium mb-1">No projects yet</h3>
                             <p className="text-neutral-500 mb-6">Create your first project to start collaborating</p>
-                            <button className="px-6 py-2 bg-white dark:bg-neutral-700 border border-neutral-200 dark:border-neutral-600 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-600 transition-colors font-medium text-sm">
+                            <button onClick={() => setIsCreateProjectModalOpen(true)} className="px-6 py-2 bg-white dark:bg-neutral-700 border border-neutral-200 dark:border-neutral-600 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-600 transition-colors font-medium text-sm">
                                 Create Project
                             </button>
                         </div>
                     ) : (
                         <div className="grid gap-4">
                             {projects.map((project) => (
-                                <div key={project._id} className="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 hover:border-blue-500/30 transition-all group shadow-sm hover:shadow-md">
+                                <Link href={`/dashboard/teams/${teamId}/projects/${project._id}`} key={project._id} className="block block bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 hover:border-blue-500/30 transition-all group shadow-sm hover:shadow-md">
                                     <div className="flex justify-between items-start mb-4">
                                         <div>
                                             <h3 className="text-lg font-semibold mb-1 group-hover:text-blue-600 transition-colors">{project.title}</h3>
@@ -190,7 +221,7 @@ export default function TeamDetailsPage({ params }: { params: Promise<{ teamId: 
                                             </div>
                                         )}
                                     </div>
-                                </div>
+                                </Link>
                             ))}
                         </div>
                     )}
@@ -274,6 +305,58 @@ export default function TeamDetailsPage({ params }: { params: Promise<{ teamId: 
                     </div>
                 </div>
             </div>
+
+            {/* Create Project Modal */}
+            {isCreateProjectModalOpen && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+                    <div className="bg-white dark:bg-neutral-900 rounded-3xl p-8 max-w-md w-full border border-neutral-200 dark:border-neutral-800 shadow-2xl">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-2xl font-bold">New Project</h2>
+                            <button onClick={() => setIsCreateProjectModalOpen(false)} className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300">
+                                ✕
+                            </button>
+                        </div>
+                        <form onSubmit={handleCreateProject} className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium mb-1 text-neutral-700 dark:text-neutral-300">Project Title</label>
+                                <input
+                                    type="text"
+                                    required
+                                    value={newProject.title}
+                                    onChange={(e) => setNewProject({ ...newProject, title: e.target.value })}
+                                    className="w-full px-4 py-2 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                                    placeholder="e.g. Website Redesign"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1 text-neutral-700 dark:text-neutral-300">Description</label>
+                                <textarea
+                                    value={newProject.description}
+                                    onChange={(e) => setNewProject({ ...newProject, description: e.target.value })}
+                                    className="w-full px-4 py-2 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all min-h-[100px] resize-y"
+                                    placeholder="Brief description of the project..."
+                                />
+                            </div>
+                            <div className="pt-4 flex justify-end gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsCreateProjectModalOpen(false)}
+                                    className="px-4 py-2 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={isCreatingProject}
+                                    className="px-6 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                >
+                                    {isCreatingProject ? <Loader /> : 'Create Project'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

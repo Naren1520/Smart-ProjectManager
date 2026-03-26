@@ -90,3 +90,15 @@ export async function chatWithAI(message: string, context: string = "") {
     return "I'm having trouble connecting to my brain right now.";
   }
 }
+
+export async function generateGeminiResponse(prompt: string) {
+  if (!apiKey) return "API Key missing";
+  try {
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    return response.text();
+  } catch (error) {
+    console.error("Error generating response:", error);
+    throw new Error('Failed to generate response');
+  }
+}
