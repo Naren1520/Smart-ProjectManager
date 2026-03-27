@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, use } from 'react';
 import { useSession } from 'next-auth/react';
-import { Send, ArrowLeft, Loader2, User } from 'lucide-react';
+import { Send, ArrowLeft, Loader2, User, Trash2, MoreVertical } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -27,9 +27,23 @@ export default function DirectChatPage({ params }: { params: Promise<{ partnerId
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [isSending, setIsSending] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
   const [partnerInfo, setPartnerInfo] = useState<{name: string, uniqueId: string, image?: string} | null>(null);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu on click outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMenu(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [menuRef]);
 
   const fetchMessages = async () => {
     try {
@@ -94,6 +108,31 @@ export default function DirectChatPage({ params }: { params: Promise<{ partnerId
     }
   };
 
+  const handleClearChat = async (redirectAfter: boolean = false) => {
+    if (!confirm('Are you sure you want to delete all messages with this user? This cannot be undone.')) return;
+    
+    setIsDeleting(true);
+    setShowMenu(false);
+    try {
+      const res = await fetch(`/api/messaging/${partnerId}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        toast.success('Chat cleared successfully');
+        setMessages([]);
+        if (redirectAfter) {
+           router.push('/dashboard/messaging');
+        }
+      } else {
+        toast.error('Failed to clear chat');
+      }
+    } catch {
+      toast.error('An error occurred');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex h-[calc(100vh-100px)] items-center justify-center">
@@ -122,6 +161,27 @@ export default function DirectChatPage({ params }: { params: Promise<{ partnerId
                  <p className="text-xs text-neutral-500">#{partnerInfo?.uniqueId}</p>
               </div>
             </div>
+        </div>
+        
+        <div className="relative" ref={menuRef}>
+            <button 
+               onClick={() => setShowMenu(!showMenu)}
+               disabled={isDeleting || messages.length === 0}
+               className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-full transition text-neutral-600 dark:text-neutral-400 disabled:opacity-50"
+            >
+               <MoreVertical className="w-5 h-5" />
+            </button>
+            {showMenu && (
+               <div className="absolute right-0 top-12 w-48 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl shadow-lg py-1 z-50 flex flex-col">
+                  <button onClick={() => handleClearChat(false)} className="px-4 py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-left w-full">
+                     Clear Chat
+                  </button>
+                  <div className="h-px w-full bg-neutral-200 dark:bg-neutral-800 my-1" />
+                  <button onClick={() => handleClearChat(true)} className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 text-left w-full">
+                     <Trash2 className="w-4 h-4" /> Delete Chat
+                  </button>
+               </div>
+            )}
         </div>
       </div>
 

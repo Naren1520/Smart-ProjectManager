@@ -90,3 +90,38 @@ export async function POST(
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
+
+export async function DELETE(
+  req: Request,
+  { params }: { params: Promise<{ partnerId: string }> }
+) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user?.email) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { partnerId } = await params;
+    await dbConnect();
+
+    const currentUser = await User.findOne({ email: session.user.email });
+    const partnerUser = await User.findOne({ uniqueId: partnerId });
+
+    if (!currentUser || !partnerUser) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    await DirectMessage.deleteMany({
+      $or: [
+        { sender: currentUser._id, receiver: partnerUser._id },
+        { sender: partnerUser._id, receiver: currentUser._id }
+      ]
+    });
+
+    return NextResponse.json({ success: true, message: 'Chat cleared' }, { status: 200 });
+
+  } catch (error) {
+    console.error('Error clearing chat:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}
