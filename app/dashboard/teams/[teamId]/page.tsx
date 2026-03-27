@@ -4,7 +4,7 @@ import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { 
-    Users, Plus, Brain, Calendar, Clock, ArrowRight, UserPlus, FileText, CheckCircle, Trash2, Copy
+    Users, Plus, Brain, Calendar, Clock, ArrowRight, UserPlus, FileText, CheckCircle, Trash2, Copy, MessageSquare
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
@@ -148,7 +148,11 @@ export default function TeamDetailsPage({ params }: { params: Promise<{ teamId: 
                     <h1 className="text-3xl font-bold mb-2 text-neutral-900 dark:text-white">{team.name}</h1>
                     <p className="text-neutral-500 dark:text-neutral-400 max-w-2xl">{team.description}</p>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-3">
+                    <Link href={`/dashboard/teams/${teamId}/chat`} className="flex items-center gap-2 px-4 py-2 bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 rounded-xl hover:bg-indigo-200 dark:hover:bg-indigo-900/50 transition-colors">
+                        <MessageSquare className="w-4 h-4" />
+                        Team Chat
+                    </Link>
                     <Link href={`/dashboard/teams/${teamId}/add-members`} className="flex items-center gap-2 px-4 py-2 bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-white rounded-xl hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors">
                         <UserPlus className="w-4 h-4" />
                         Manage Members

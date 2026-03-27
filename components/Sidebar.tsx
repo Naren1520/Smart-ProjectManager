@@ -11,7 +11,6 @@ export const links = [
   { href: '/dashboard/ai-tools', label: 'AI Tools', icon: Sparkles },
   { href: '/dashboard/teams', label: 'Teams', icon: Users },
   { href: '/dashboard/projects', label: 'Projects', icon: FolderKanban },
-  { href: '/dashboard/chat', label: 'AI Chat', icon: MessageSquare },
   { href: '/dashboard/meet', label: 'Meeting', icon: Video },
   { href: '/dashboard/docs', label: 'Docs', icon: FileText },
   { href: '/dashboard/rewards', label: 'Rewards', icon: Award },
