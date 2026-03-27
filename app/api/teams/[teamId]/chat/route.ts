@@ -6,6 +6,8 @@ import Message from '@/models/Message';
 import Team from '@/models/Team';
 import User from '@/models/User';
 
+export const dynamic = 'force-dynamic';
+
 // GET all messages for a team
 export async function GET(
   req: Request,
@@ -35,6 +37,7 @@ export async function GET(
 
     const messages = await Message.find({ team: teamId })
       .populate('sender', 'name email')
+      .populate('replyTo')
       .sort({ createdAt: 1 })
       .lean();
 
@@ -59,7 +62,7 @@ export async function POST(
 
     const { teamId } = await params;
     const body = await req.json();
-    const { content } = body;
+    const { content, replyTo } = body;
 
     if (!content) {
       return NextResponse.json({ error: 'Message content is required' }, { status: 400 });
@@ -79,17 +82,26 @@ export async function POST(
       return NextResponse.json({ error: 'Not a member of this team' }, { status: 403 });
     }
 
-    const newMessage = await Message.create({
+    const messageData: any = {
       content,
       sender: user._id,
       team: teamId,
       isAI: false
-    });
+    };
+
+    if (replyTo) {
+      messageData.replyTo = replyTo;
+    }
+
+    const newMessage = await Message.create(messageData);
 
     // Populate sender details before returning
-    const populatedMessage = await newMessage.populate('sender', 'name email');
+    await newMessage.populate('sender', 'name email');
+    if (newMessage.replyTo) {
+      await newMessage.populate('replyTo');
+    }
 
-    return NextResponse.json({ message: populatedMessage }, { status: 201 });
+    return NextResponse.json({ message: newMessage }, { status: 201 });
 
   } catch (error) {
     console.error('Error posting chat message:', error);
