@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 // import { links } from './Sidebar'; // Importing shared links configuration
 
 // Re-defining directly to include icon component type
-import { LayoutDashboard, Users, FolderKanban, MessageSquare, Video, FileText, Award, Sparkles, UserCircle } from 'lucide-react';
+import { LayoutDashboard, Users, FolderKanban, MessageSquare, Video, FileText, Award, Sparkles, UserCircle, MessageCircle } from 'lucide-react';
 
 const links = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -18,7 +18,7 @@ const links = [
   { href: '/dashboard/ai-tools', label: 'AI Tools', icon: Sparkles },
   { href: '/dashboard/teams', label: 'Teams', icon: Users },
   { href: '/dashboard/projects', label: 'Projects', icon: FolderKanban },
-  { href: '/dashboard/chat', label: 'AI Chat', icon: MessageSquare },
+  { href: '/dashboard/messaging', label: 'Messaging', icon: MessageCircle },
   { href: '/dashboard/meet', label: 'Meeting', icon: Video },
   { href: '/dashboard/docs', label: 'Docs', icon: FileText },
   { href: '/dashboard/rewards', label: 'Rewards', icon: Award },
