@@ -91,10 +91,20 @@ export async function chatWithAI(message: string, context: string = "") {
   }
 }
 
-export async function generateGeminiResponse(prompt: string) {
+export async function generateGeminiResponse(prompt: string, attachment?: { data: string; mimeType: string }) {
   if (!apiKey) return "API Key missing";
   try {
-    const result = await model.generateContent(prompt);
+    const parts: any[] = [{ text: prompt }];
+    if (attachment && attachment.data && attachment.mimeType) {
+      parts.push({
+        inlineData: {
+          data: attachment.data,
+          mimeType: attachment.mimeType,
+        }
+      });
+    }
+
+    const result = await model.generateContent(parts);
     const response = await result.response;
     return response.text();
   } catch (error) {

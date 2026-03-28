@@ -19,7 +19,7 @@ export async function POST(
 
     const { teamId, projectId } = await params;
     const body = await req.json();
-    const { message, history, finalize } = body;
+    const { message, history, finalize, fileData } = body;
 
     await dbConnect();
     
@@ -85,8 +85,12 @@ Do not distribute tasks yet; wait until they are ready to finalize.`;
         // build context
         const context = history.map((mh: any) => `${mh.role}: ${mh.content}`).join('\n');
         
-        const prompt = systemPrompt + "\n\n" + context + `\nuser: ${message}\nai:`;
-        const aiResponse = await generateGeminiResponse(prompt);
+        let prompt = systemPrompt + "\n\n" + context + `\nuser: ${message}\nai:`;
+        if (fileData) {
+            prompt += `\n[User also attached a file: ${fileData.mimeType}]`;
+        }
+        
+        const aiResponse = await generateGeminiResponse(prompt, fileData);
 
         return NextResponse.json({
             reply: aiResponse,

@@ -22,8 +22,31 @@ export default function ProjectWorkspace({ params }: { params: Promise<{ teamId:
     { role: 'ai', content: "Hello! I am ready to help you plan this project. Please describe your project idea, requirements, or upload any context you have. Once we finalize the scope, I will look at your team's skills and distribute the tasks automatically." }
   ]);
   const [input, setInput] = useState('');
+  const [file, setFile] = useState<File | null>(null);
+  const [fileData, setFileData] = useState<{ data: string; mimeType: string } | null>(null);
   const [isSending, setIsSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (selectedFile) {
+      if (selectedFile.size > 4 * 1024 * 1024) {
+        toast.error('File must be less than 4MB');
+        return;
+      }
+      setFile(selectedFile);
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const base64String = (event.target?.result as string).split(',')[1];
+        setFileData({
+          data: base64String,
+          mimeType: selectedFile.type
+        });
+      };
+      reader.readAsDataURL(selectedFile);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -51,18 +74,23 @@ export default function ProjectWorkspace({ params }: { params: Promise<{ teamId:
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim()) return;
+    if (!input.trim() && !file) return;
 
-    const userMessage = input;
+    let userMessage = input.trim();
+    if (file && !userMessage) userMessage = `Attached: ${file.name}`;
     setInput('');
     setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
     setIsSending(true);
+
+    const payload = fileData ? { message: userMessage, history: messages, fileData } : { message: userMessage, history: messages };
+    setFile(null);
+    setFileData(null);
 
     try {
       const res = await fetch(`/api/teams/${teamId}/projects/${projectId}/ai-planning`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMessage, history: messages })
+        body: JSON.stringify(payload)
       });
 
       const data = await res.json();
@@ -177,8 +205,16 @@ export default function ProjectWorkspace({ params }: { params: Promise<{ teamId:
            </div>
 
            <form onSubmit={handleSendMessage} className="p-4 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 flex-shrink-0">
+              {file && (
+                 <div className="flex items-center gap-2 mb-2 px-3 py-1.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-lg text-sm w-fit">
+                    <FileText className="w-4 h-4" />
+                    <span className="truncate max-w-[200px]">{file.name}</span>
+                    <button type="button" onClick={() => { setFile(null); setFileData(null); }} className="ml-2 hover:text-red-500 font-bold">&times;</button>
+                 </div>
+              )}
               <div className="relative flex items-center gap-2">
-                 <button type="button" className="p-3 bg-neutral-100 dark:bg-neutral-800 text-neutral-500 rounded-xl hover:bg-neutral-200 dark:hover:bg-neutral-700 transition">
+                 <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/*,.pdf,.doc,.docx,.txt" />
+                 <button type="button" onClick={() => fileInputRef.current?.click()} className="p-3 bg-neutral-100 dark:bg-neutral-800 text-neutral-500 rounded-xl hover:bg-neutral-200 dark:hover:bg-neutral-700 transition">
                     <Paperclip className="w-5 h-5" />
                  </button>
                  <div className="relative flex-1">
@@ -192,7 +228,7 @@ export default function ProjectWorkspace({ params }: { params: Promise<{ teamId:
                      />
                      <button
                        type="submit"
-                       disabled={!input.trim() || isSending}
+                       disabled={(!input.trim() && !file) || isSending}
                        className="absolute right-2 bottom-2 p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                      >
                        <Send className="w-4 h-4" />
