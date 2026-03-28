@@ -5,9 +5,10 @@ import { useState } from 'react';
 
 interface CertificateActionsProps {
   userName: string;
+  memberId?: string;
 }
 
-export default function CertificateActions({ userName }: CertificateActionsProps) {
+export default function CertificateActions({ userName, memberId = 'TF-USER' }: CertificateActionsProps) {
   const [showShareMenu, setShowShareMenu] = useState(false);
   const certificateUrl = typeof window !== 'undefined' ? window.location.href : '';
   const shareText = `Check out my Certificate of Excellence from TeamForge AI! 🎓`;
@@ -138,13 +139,13 @@ export default function CertificateActions({ userName }: CertificateActionsProps
 
       // Add Logo at Top Center
       if (logoDataUrl) {
-         const logoSize = 35;
+         const logoSize = 24; // Scaled down from 35mm
          const logoX = (pageWidth - logoSize) / 2;
-         const logoY = margin + 10;
+         const logoY = margin + 12; // Moved slightly down
          const centerX = logoX + logoSize / 2;
          const centerY = logoY + logoSize / 2;
          const radius = logoSize / 2;
-         
+
          // Draw circle background for logo
          pdf.setFillColor(255, 255, 255);
          pdf.circle(centerX, centerY, radius, 'F');
@@ -165,14 +166,14 @@ export default function CertificateActions({ userName }: CertificateActionsProps
       }
 
       // Title
-      pdf.setFontSize(50); // Slightly smaller to fit
+      pdf.setFontSize(44); // Slightly smaller to fix overlap
       pdf.setTextColor(101, 67, 33); // Dark brown
       pdf.text('CERTIFICATE', pageWidth / 2, margin + 55, { align: 'center' });
 
       // Subtitle
-      pdf.setFontSize(24);
+      pdf.setFontSize(16);
       pdf.setTextColor(139, 90, 43); // Dark golden brown
-      pdf.text('of Excellence', pageWidth / 2, margin + 62, { align: 'center' });
+      pdf.text('OF MEMBERSHIP', pageWidth / 2, margin + 65, { align: 'center' });
 
       // Divider line
       pdf.setDrawColor(180, 127, 0);
@@ -182,29 +183,38 @@ export default function CertificateActions({ userName }: CertificateActionsProps
       // Presented to text
       pdf.setFontSize(14);
       pdf.setTextColor(80, 80, 80);
-      pdf.text('This is proudly presented to', pageWidth / 2, margin + 85, { align: 'center' });
+      pdf.text('This is to certify that', pageWidth / 2, margin + 80, { align: 'center' });
 
       // User name - highlighted
-      pdf.setFontSize(36);
+      pdf.setFontSize(28);
       pdf.setTextColor(101, 67, 33);
       pdf.setFont(undefined, 'bold');
-      pdf.text(userName, pageWidth / 2, margin + 105, { align: 'center' });
+      pdf.text(userName, pageWidth / 2, margin + 93, { align: 'center' });
 
       // Underline name
       pdf.setDrawColor(180, 127, 0);
       pdf.setLineWidth(1);
-      pdf.line(pageWidth / 2 - 50, margin + 110, pageWidth / 2 + 50, margin + 110);
+      pdf.line(pageWidth / 2 - 40, margin + 96, pageWidth / 2 + 40, margin + 96);
 
       // Achievement text
       pdf.setFont(undefined, 'normal');
       pdf.setFontSize(12);
       pdf.setTextColor(100, 100, 100);
-      const achievementText =
-        'For outstanding achievement and dedication to excellence in mastering advanced project management skills and demonstrating exceptional leadership qualities within the TeamForge platform.';
-      pdf.text(achievementText, pageWidth / 2, margin + 125, {
-        align: 'center',
-        maxWidth: pageWidth - 50,
-      });
+      
+      // Calculate split text for accurate spacing
+      const achievementText1 = 'is an official member of the TeamForge AI Platform.';
+      const achievementText2 = 'As a valued member, they are recognized for being part of our collaborative environment,';
+      const achievementText3 = 'contributing to team activities, and engaging in project development and management.';
+      const achievementText4 = 'We appreciate their association and look forward to their continued participation';
+      const achievementText5 = 'and growth within the platform.';
+
+      pdf.text(achievementText1, pageWidth / 2, margin + 108, { align: 'center' });
+      
+      pdf.text(achievementText2, pageWidth / 2, margin + 118, { align: 'center' });
+      pdf.text(achievementText3, pageWidth / 2, margin + 124, { align: 'center' });
+      
+      pdf.text(achievementText4, pageWidth / 2, margin + 134, { align: 'center' });
+      pdf.text(achievementText5, pageWidth / 2, margin + 140, { align: 'center' });
 
       // Bottom divider
       pdf.setDrawColor(180, 127, 0);
@@ -214,37 +224,50 @@ export default function CertificateActions({ userName }: CertificateActionsProps
       // Footer information
       const footerY = pageHeight - margin - 20;
 
-      // Date column
-      pdf.setFontSize(11);
-      pdf.setTextColor(80, 80, 80);
-      pdf.text('Date', margin + 25, footerY - 10, { align: 'center' });
+      // Left column (Membership ID & Date)
       pdf.setFontSize(10);
+      pdf.setTextColor(180, 127, 0);
+      pdf.setFont(undefined, 'bold');
+      pdf.text('MEMBERSHIP ID', margin + 30, footerY - 10, { align: 'center' });
+      pdf.setTextColor(80, 80, 80);
+      pdf.setFont(undefined, 'normal');
+      pdf.text(`#${memberId}`, margin + 30, footerY - 4, { align: 'center' });
+
       const currentDate = new Date().toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
       });
-      pdf.setDrawColor(80, 80, 80);
-      pdf.line(margin + 15, footerY - 3, margin + 35, footerY - 3);
-      pdf.text(currentDate, margin + 25, footerY + 3, { align: 'center' });
+      pdf.setTextColor(180, 127, 0);
+      pdf.setFont(undefined, 'bold');
+      pdf.text('DATE OF JOINING', margin + 30, footerY + 4, { align: 'center' });
+      pdf.setTextColor(80, 80, 80);
+      pdf.setFont(undefined, 'normal');
+      pdf.text(currentDate, margin + 30, footerY + 10, { align: 'center' });
 
       // Seal column (center)
-      // We can also put the logo here again or just TF
       pdf.setFontSize(24);
       pdf.setTextColor(180, 127, 0);
       pdf.setFont(undefined, 'bold');
-      pdf.text('TF', pageWidth / 2, footerY, { align: 'center' });
-      pdf.circle(pageWidth / 2, footerY - 2, 8, 'S');
+      pdf.text('TF', pageWidth / 2, footerY - 2, { align: 'center' });
+      pdf.setFontSize(8);
+      pdf.text('PLATFORM', pageWidth / 2, footerY + 4, { align: 'center' });
+      pdf.circle(pageWidth / 2, footerY - 1, 10, 'S');
 
       // Authority column
-      pdf.setFont(undefined, 'normal');
-      pdf.setFontSize(11);
-      pdf.setTextColor(80, 80, 80);
-      pdf.text('Authorized By', pageWidth - margin - 25, footerY - 10, { align: 'center' });
-      pdf.setFontSize(10);
+      pdf.setFont(undefined, 'italic'); // pseudo-signature
+      pdf.setFontSize(18);
+      pdf.setTextColor(101, 67, 33);
+      pdf.text('Naren S J', pageWidth - margin - 35, footerY - 5, { align: 'center' });
+      
       pdf.setDrawColor(80, 80, 80);
-      pdf.line(pageWidth - margin - 35, footerY - 3, pageWidth - margin - 15, footerY - 3);
-      pdf.text('TeamForge', pageWidth - margin - 25, footerY + 3, { align: 'center' });
+      pdf.setLineWidth(0.5);
+      pdf.line(pageWidth - margin - 55, footerY, pageWidth - margin - 15, footerY);
+      
+      pdf.setFont(undefined, 'bold');
+      pdf.setFontSize(10);
+      pdf.setTextColor(180, 127, 0);
+      pdf.text('AUTHORIZED SIGNATURE', pageWidth - margin - 35, footerY + 6, { align: 'center' });
 
       // Save PDF
       pdf.save(`certificate-${userName.replace(/\s+/g, '-')}.pdf`);

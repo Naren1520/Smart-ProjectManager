@@ -2,6 +2,7 @@
 
 import { useSession } from 'next-auth/react';
 import { useRef } from 'react';
+import Image from 'next/image';
 import CertificateActions from '@/components/CertificateActions';
 
 export default function CertificatePage() {
@@ -9,6 +10,9 @@ export default function CertificatePage() {
   const certificateRef = useRef<HTMLDivElement>(null);
 
   const userName = session?.user?.name || 'Certificate Holder';
+  const memberId = session?.user?.email 
+    ? `TF-${session.user.email.split('@')[0].toUpperCase()}`
+    : `TF-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
   const currentDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
@@ -25,13 +29,16 @@ export default function CertificatePage() {
         </div>
 
         {/* Certificate Container */}
-        <div className="mb-8 flex justify-center">
+        <div className="mb-8 flex justify-center w-full overflow-x-auto pb-4">
           <div
             ref={certificateRef}
             data-certificate
-            className="relative w-full max-w-4xl"
+            className="relative flex-none"
             style={{
-              aspectRatio: '4 / 3',
+              width: '100%',
+              minWidth: '800px', // Forces the certificate to stay rectangular and horizontal
+              maxWidth: '1000px', 
+              aspectRatio: '1.414 / 1', // standard A4 landscape ratio
             }}
           >
             {/* Outer Border */}
@@ -54,72 +61,100 @@ export default function CertificatePage() {
               </div>
 
               {/* Main Content */}
-              <div className="flex flex-col items-center justify-center h-full px-12 py-8 relative z-10">
-                {/* Certificate Badge */}
-                <div className="mb-6 text-center">
-                  <div className="inline-block relative">
-                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg">
-                      <span className="text-3xl">★</span>
+              <div className="flex flex-col items-center justify-between h-full px-8 py-6 relative z-10">
+                {/* Header Area */}
+                <div className="flex flex-col items-center mt-2">
+                  {/* Certificate Badge */}
+                  <div className="mb-3 text-center">
+                    <div className="inline-block relative">
+                      <div className="w-14 h-14 rounded-full bg-white shadow-lg relative overflow-hidden flex items-center justify-center">
+                        <Image 
+                          src="/logo.png" 
+                          alt="TeamForge Logo" 
+                          fill
+                          sizes="56px"
+                          className="object-cover"
+                        />
+                      </div>
+                      <div className="absolute inset-0 rounded-full border-2 border-amber-300 animate-spin" style={{ animationDuration: '20s' }} />
                     </div>
-                    <div className="absolute inset-0 rounded-full border-2 border-amber-300 animate-spin" style={{ animationDuration: '20s' }} />
                   </div>
+
+                  {/* Title */}
+                  <h2 className="text-4xl font-bold text-amber-900 mb-1 text-center tracking-wide">
+                    CERTIFICATE
+                  </h2>
+                  <h3 className="text-xl text-amber-700 font-semibold tracking-widest uppercase mb-3">
+                    of Membership
+                  </h3>
+
+                  {/* Divider */}
+                  <div className="w-24 h-1 bg-gradient-to-r from-transparent via-amber-600 to-transparent" />
                 </div>
 
-                {/* Title */}
-                <h2 className="text-5xl font-bold text-amber-900 mb-2 text-center tracking-wide">
-                  CERTIFICATE
-                </h2>
-                <h3 className="text-2xl text-amber-700 mb-8 font-semibold">
-                  of Excellence
-                </h3>
-
-                {/* Divider */}
-                <div className="w-32 h-1 bg-gradient-to-r from-transparent via-amber-600 to-transparent mb-8" />
-
                 {/* Content Section */}
-                <div className="text-center mb-8 flex-grow flex flex-col justify-center">
-                  <p className="text-gray-700 mb-4 text-lg">This is proudly presented to</p>
+                <div className="text-center flex flex-col justify-center max-w-3xl mx-auto px-4 my-2">
+                  <p className="text-gray-700 text-lg font-medium mb-3">This is to certify that</p>
 
                   {/* User Name - Main Focus */}
-                  <div className="mb-6">
-                    <p className="text-4xl font-bold text-amber-900 tracking-wide mb-1">
+                  <div className="mb-4">
+                    <p className="text-3xl font-bold text-amber-900 tracking-wide mb-1 px-4 truncate">
                       {userName}
                     </p>
                     <div className="w-40 h-0.5 bg-amber-600 mx-auto" />
                   </div>
 
                   {/* Achievement Text */}
-                  <p className="text-gray-700 text-base max-w-lg mx-auto leading-relaxed">
-                    For outstanding achievement and dedication to excellence in mastering advanced project management skills and demonstrating exceptional leadership qualities within the TeamForge platform.
-                  </p>
+                  <div className="text-gray-700 text-base leading-snug flex flex-col gap-2">
+                    <p>
+                      is an official member of the <span className="font-semibold text-gray-900">TeamForge AI Platform</span>.
+                    </p>
+                    <p>
+                      As a valued member, they are recognized for being part of our collaborative environment, contributing to team activities, and engaging in project development and management.
+                    </p>
+                    <p>
+                      We appreciate their association and look forward to their continued participation and growth within the platform.
+                    </p>
+                  </div>
                 </div>
 
-                {/* Divider */}
-                <div className="w-32 h-1 bg-gradient-to-r from-transparent via-amber-600 to-transparent mb-8" />
+                {/* Divider Area */}
+                <div className="w-24 h-1 bg-gradient-to-r from-transparent via-amber-600 to-transparent mb-2" />
 
                 {/* Footer Information */}
-                <div className="flex justify-between items-end w-full px-8 py-4">
-                  {/* Date */}
-                  <div className="text-center flex-1">
-                    <p className="text-sm text-gray-600 mb-1">Date</p>
-                    <p className="text-gray-800 font-semibold border-b border-gray-800 pb-1">
-                      {currentDate}
-                    </p>
+                <div className="flex justify-between items-end w-full px-4 pb-2">
+                  {/* Left Footer items */}
+                  <div className="flex flex-col text-left flex-1 space-y-1 mb-2">
+                    <div>
+                      <p className="text-[10px] text-amber-700 font-semibold mb-0.5 uppercase tracking-wider">Membership ID</p>
+                      <p className="text-xs text-gray-800 font-medium">#{memberId}</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-amber-700 font-semibold mb-0.5 uppercase tracking-wider">Date of Joining</p>
+                      <p className="text-xs text-gray-800 font-medium">{currentDate}</p>
+                    </div>
                   </div>
 
                   {/* Seal/Badge */}
-                  <div className="flex-1 flex justify-center">
-                    <div className="w-20 h-20 rounded-full border-4 border-amber-600 flex items-center justify-center bg-amber-50">
-                      <span className="text-2xl text-amber-600">TF</span>
+                  <div className="flex-1 flex justify-center mb-1">
+                    <div className="relative group">
+                      <div className="w-20 h-20 rounded-full border-4 border-amber-600 flex flex-col items-center justify-center bg-gradient-to-br from-amber-50 to-amber-100 shadow-inner">
+                        <span className="text-2xl font-bold text-amber-600 tracking-tighter">TF</span>
+                        <span className="text-[8px] font-semibold text-amber-700 tracking-widest mt-0.5 uppercase">Platform</span>
+                      </div>
                     </div>
                   </div>
 
                   {/* Signature Line */}
-                  <div className="text-center flex-1">
-                    <p className="text-sm text-gray-600 mb-1">Authorized By</p>
-                    <p className="text-gray-800 font-semibold border-b border-gray-800 pb-1">
-                      TeamForge
-                    </p>
+                  <div className="text-center flex-1 mb-2">
+                    <div className="flex flex-col items-center justify-end h-full">
+                      {/* Signature styling (cursive style text) */}
+                      <p className="font-serif text-xl text-amber-900 mb-1" style={{ WebkitFontSmoothing: 'antialiased' }}>
+                        Naren S J
+                      </p>
+                      <div className="w-32 border-b border-gray-400 mb-1"></div>
+                      <p className="text-[10px] text-amber-700 font-semibold uppercase tracking-wider">Authorized Signature</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -128,7 +163,7 @@ export default function CertificatePage() {
         </div>
 
         {/* Action Buttons */}
-        <CertificateActions userName={userName} />
+        <CertificateActions userName={userName} memberId={memberId} />
       </div>
     </div>
   );
