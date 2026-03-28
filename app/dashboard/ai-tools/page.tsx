@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSession } from 'next-auth/react';
-import { Bot, FileText, Briefcase, Loader2, Sparkles, User, CheckCircle2 } from 'lucide-react';
+import { Bot, FileText, Briefcase, Loader2, Sparkles, User, CheckCircle2, MessageSquare, Send } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function AIToolsPage() {
   const { data: session } = useSession();
-  const [activeTab, setActiveTab] = useState<'tasks' | 'resume'>('tasks');
+  const [activeTab, setActiveTab] = useState<'tasks' | 'resume' | 'assistant'>('tasks');
   const [currentUser, setCurrentUser] = useState<any>(null);
 
   // Fetch current user skills on mount
@@ -34,6 +34,48 @@ export default function AIToolsPage() {
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [resumeAnalysis, setResumeAnalysis] = useState<any>(null);
   const [isAnalyzingResume, setIsAnalyzingResume] = useState(false);
+
+  // AI Assistant State
+  const [chatMessages, setChatMessages] = useState<{role: 'user' | 'ai', content: string}[]>([
+    { role: 'ai', content: "Hello! I'm your AI Assistant. How can I help you today?" }
+  ]);
+  const [chatInput, setChatInput] = useState('');
+  const [isChatSeding, setIsChatSending] = useState(false);
+  const chatEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (activeTab === 'assistant') {
+      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [chatMessages, activeTab]);
+
+  const handleSendChatMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!chatInput.trim()) return;
+
+    const userMsg = chatInput;
+    setChatInput('');
+    setChatMessages(prev => [...prev, { role: 'user', content: userMsg }]);
+    setIsChatSending(true);
+
+    try {
+      const res = await fetch('/api/assistant', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userMsg, history: chatMessages })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setChatMessages(prev => [...prev, { role: 'ai', content: data.reply }]);
+      } else {
+        setChatMessages(prev => [...prev, { role: 'ai', content: 'Sorry, I encountered an error.' }]);
+      }
+    } catch (error) {
+      console.error("Chat error:", error);
+    } finally {
+      setIsChatSending(false);
+    }
+  };
 
   const generateTasks = async () => {
     if (!projectDesc.trim()) return;
@@ -114,27 +156,27 @@ export default function AIToolsPage() {
   };
 
   return (
-    <div className="p-8 max-w-6xl mx-auto space-y-8">
+    <div className="p-4 md:p-8 max-w-6xl mx-auto space-y-6 md:space-y-8">
       <div>
-        <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
-          <Sparkles className="w-8 h-8 text-blue-500" />
+        <h1 className="text-2xl md:text-3xl font-bold mb-2 flex items-center gap-2 md:gap-3">
+          <Sparkles className="w-6 h-6 md:w-8 md:h-8 text-blue-500" />
           AI Power Tools
         </h1>
-        <p className="text-neutral-500">Leverage Gemini AI to automate your workflows.</p>
+        <p className="text-sm md:text-base text-neutral-500">Leverage Gemini AI to automate your workflows.</p>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-4 border-b border-neutral-200 dark:border-neutral-800">
+      <div className="flex gap-2 sm:gap-4 border-b border-neutral-200 dark:border-neutral-800 overflow-x-auto hide-scrollbar">
         <button
           onClick={() => setActiveTab('tasks')}
-          className={`pb-4 px-4 font-medium transition-colors relative ${
+          className={`whitespace-nowrap pb-3 sm:pb-4 px-3 sm:px-4 font-medium transition-colors relative text-sm sm:text-base ${
             activeTab === 'tasks' 
               ? 'text-blue-600' 
               : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'
           }`}
         >
-          <div className="flex items-center gap-2">
-            <Briefcase className="w-5 h-5" />
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <Briefcase className="w-4 h-4 sm:w-5 sm:h-5" />
             Task Generator
           </div>
           {activeTab === 'tasks' && (
@@ -143,17 +185,33 @@ export default function AIToolsPage() {
         </button>
         <button
           onClick={() => setActiveTab('resume')}
-          className={`pb-4 px-4 font-medium transition-colors relative ${
+          className={`whitespace-nowrap pb-3 sm:pb-4 px-3 sm:px-4 font-medium transition-colors relative text-sm sm:text-base ${
             activeTab === 'resume' 
               ? 'text-blue-600' 
               : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'
           }`}
         >
-          <div className="flex items-center gap-2">
-            <FileText className="w-5 h-5" />
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
             Resume Analyzer
           </div>
           {activeTab === 'resume' && (
+            <motion.div layoutId="activeTab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600" />
+          )}
+        </button>
+        <button
+          onClick={() => setActiveTab('assistant')}
+          className={`whitespace-nowrap pb-3 sm:pb-4 px-3 sm:px-4 font-medium transition-colors relative text-sm sm:text-base ${
+            activeTab === 'assistant' 
+              ? 'text-blue-600' 
+              : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'
+          }`}
+        >
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5" />
+            AI Assistant
+          </div>
+          {activeTab === 'assistant' && (
             <motion.div layoutId="activeTab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600" />
           )}
         </button>
@@ -166,11 +224,11 @@ export default function AIToolsPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="grid grid-cols-1 lg:grid-cols-2 gap-8"
+            className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8"
           >
             {/* Input Section */}
-            <div className="space-y-6">
-              <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-6 shadow-sm">
+            <div className="space-y-4 lg:space-y-6">
+              <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 md:p-6 shadow-sm">
                 <label className="block font-medium mb-2 text-neutral-700 dark:text-neutral-300">
                   Project Description
                 </label>
@@ -239,17 +297,17 @@ export default function AIToolsPage() {
               )}
             </div>
           </motion.div>
-        ) : (
+        ) : activeTab === 'resume' ? (
           <motion.div 
             key="resume"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="grid grid-cols-1 lg:grid-cols-2 gap-8"
+            className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8"
           >
              {/* Input Section */}
-             <div className="space-y-6">
-              <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-6 shadow-sm">
+             <div className="space-y-4 lg:space-y-6">
+              <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 md:p-6 shadow-sm">
                 <label className="block font-medium mb-4 text-neutral-700 dark:text-neutral-300">
                   Upload PDF or Paste Resume
                 </label>
@@ -317,14 +375,14 @@ export default function AIToolsPage() {
                     <motion.div 
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-6 shadow-sm space-y-6"
+                        className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 sm:p-6 shadow-sm space-y-4 sm:space-y-6"
                     >
                         <div>
-                            <h3 className="text-lg font-bold mb-2 flex items-center gap-2">
+                            <h3 className="text-base sm:text-lg font-bold mb-2 flex items-center gap-2">
                                 <CheckCircle2 className="w-5 h-5 text-green-500" />
                                 Professional Summary
                             </h3>
-                            <p className="text-neutral-600 dark:text-neutral-300 leading-relaxed">
+                            <p className="text-neutral-600 dark:text-neutral-300 leading-relaxed text-sm sm:text-base">
                                 {resumeAnalysis.summary}
                             </p>
                         </div>
@@ -340,7 +398,7 @@ export default function AIToolsPage() {
                             </div>
                         </div>
 
-                         <div className="grid grid-cols-2 gap-4">
+                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="p-4 bg-neutral-50 dark:bg-neutral-800 rounded-xl">
                                 <span className="text-sm text-neutral-500 block mb-1">Experience Level</span>
                                 <span className="font-semibold text-lg">{resumeAnalysis.experienceLevel}</span>
@@ -361,7 +419,63 @@ export default function AIToolsPage() {
                 )}
             </div>
           </motion.div>
-        )}
+        ) : activeTab === 'assistant' ? (
+          <motion.div
+            key="assistant"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="h-[calc(100vh-14rem)] min-h-[500px] md:h-[600px] flex flex-col bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl overflow-hidden shadow-sm w-full max-w-4xl mx-auto"
+          >
+            <div className="flex-1 p-4 md:p-6 overflow-y-auto space-y-4">
+              {chatMessages.map((msg, idx) => (
+                <div key={idx} className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  {msg.role === 'ai' && (
+                    <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+                      <Bot className="w-5 h-5" />
+                    </div>
+                  )}
+                  <div className={`max-w-[75%] p-4 rounded-2xl text-sm ${
+                    msg.role === 'user' 
+                      ? 'bg-blue-600 text-white rounded-br-none' 
+                      : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-gray-100 rounded-bl-none whitespace-pre-wrap'
+                  }`}>
+                    {msg.content}
+                  </div>
+                  {msg.role === 'user' && (
+                    <div className="w-8 h-8 rounded-full bg-neutral-200 text-neutral-600 flex items-center justify-center shrink-0">
+                      <User className="w-5 h-5" />
+                    </div>
+                  )}
+                </div>
+              ))}
+              {isChatSeding && (
+                <div className="flex gap-3 justify-start">
+                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+                    <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+                  </div>
+                </div>
+              )}
+              <div ref={chatEndRef} />
+            </div>
+            
+            <form onSubmit={handleSendChatMessage} className="p-3 md:p-4 bg-neutral-50 dark:bg-neutral-800/50 border-t border-neutral-200 dark:border-neutral-800 flex gap-2 md:gap-4">
+              <input
+                value={chatInput}
+                onChange={e => setChatInput(e.target.value)}
+                placeholder="Ask me anything..."
+                className="flex-1 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-xl px-3 py-2 md:px-4 md:py-3 outline-none focus:ring-2 focus:ring-blue-500/50 transition-all font-medium text-sm md:text-base"
+              />
+              <button
+                type="submit"
+                disabled={isChatSeding || !chatInput.trim()}
+                className="p-2.5 md:p-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center shrink-0"
+              >
+                <Send className="w-5 h-5" />
+              </button>
+            </form>
+          </motion.div>
+        ) : null}
       </AnimatePresence>
     </div>
   );
