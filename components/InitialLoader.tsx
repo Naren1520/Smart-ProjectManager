@@ -55,23 +55,28 @@ export function InitialLoader() {
               transition={{ duration: 0.5, ease: "easeOut" }}
               className="mb-8 relative"
             >
-              <div className="w-32 h-32 relative rounded-full overflow-hidden shadow-2xl shadow-blue-500/30">
-                <Image 
-                  src="/logo.png" 
-                  alt="TeamForge AI Logo" 
-                  fill
-                  sizes="128px"
-                  className="object-cover"
-                  priority
-                />
+              <div className="inline-block relative">
+                <div className="w-32 h-32 bg-white rounded-full overflow-hidden shadow-2xl shadow-amber-500/20 relative flex items-center justify-center">
+                  <Image 
+                    src="/logo.png" 
+                    alt="TeamForge AI Logo" 
+                    fill
+                    sizes="128px"
+                    className="object-cover"
+                    priority
+                  />
+                </div>
+                {/* Golden round animation like certificate */}
+                <div className="absolute inset-0 rounded-full border-[3px] border-amber-300 border-t-amber-500 animate-spin" style={{ animationDuration: '3s' }} />
+                <div className="absolute inset-[-6px] rounded-full border border-amber-500/30 animate-[spin_8s_linear_infinite_reverse]" />
               </div>
               
               {/* Ripple Effect */}
               <motion.div
                 initial={{ scale: 1, opacity: 0 }}
-                animate={{ scale: 2, opacity: 0 }}
+                animate={{ scale: 1.8, opacity: 0 }}
                 transition={{ duration: 1.5, repeat: Infinity, ease: "easeOut", delay: 0.5 }}
-                className="absolute inset-0 bg-blue-500/30 rounded-full z-[-1]"
+                className="absolute inset-0 bg-amber-500/20 rounded-full z-[-1]"
               />
             </motion.div>
 

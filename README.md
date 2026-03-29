@@ -20,7 +20,10 @@ In hackathons and fast-paced development environments, forming the right team an
 - **XP & Leveling System**: Earn experience points for completing tasks and contributing to projects.
 - **Achievement Badges**: Unlock badges like "Top Contributor", "Team Leader", and "Bug Hunter".
 - **Dynamic Certificates**: Generate professional, verifiable PDF certificates with custom vector graphics and circular logo clipping (using `jsPDF`).
-
+### Advanced Integrations & Tools
+- **GitHub Integration**: Automatically verify skills and fetch top languages by connecting your GitHub account.
+- **AI Resume Analyzer**: Upload a PDF or raw text of your resume to receive AI-driven feedback and skill extraction.
+- **Real-Time Messaging & Meetings**: Utilize built-in team chat and the "Meet" workspace for seamless collaboration.
 ### Collaborative Documentation
 - **Centralized Knowledge Base**: Create and manage project documentation (Guides, APIs, Meeting Notes).
 - **Real-time Updates**: Keep everyone on the same page with a unified docs hub.
@@ -115,8 +118,7 @@ Follow these steps to set up the project locally.
 
 ##  What's Next for TeamForge AI
 
-- **GitHub Integration**: Automatically verify skills by analyzing users' public repositories.
-- **Smart Interviews**: An AI interviewer that vets candidates for teams before they join.
+- **Smart Interviews**: An AI interviewer that vets candidates for teams before they join, utilizing video and audio capabilities.
 - **Mobile App**: A React Native companion app for managing tasks on the go.
 
 ---
