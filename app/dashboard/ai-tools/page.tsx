@@ -162,7 +162,7 @@ export default function AIToolsPage() {
           <Sparkles className="w-6 h-6 md:w-8 md:h-8 text-blue-500" />
           AI Power Tools
         </h1>
-        <p className="text-sm md:text-base text-neutral-500">Leverage Gemini AI to automate your workflows.</p>
+        <p className="text-sm md:text-base text-neutral-500">Leverage AI to automate your workflows.</p>
       </div>
 
       {/* Tabs */}

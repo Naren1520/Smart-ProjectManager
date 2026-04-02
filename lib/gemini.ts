@@ -91,6 +91,43 @@ export async function chatWithAI(message: string, context: string = "") {
   }
 }
 
+export async function generateMeetingSummary(transcript: string) {
+  if (!apiKey) return "API Key missing";
+
+  const prompt = `
+    You are an AI meeting assistant. Please analyze the following meeting transcript and generate a structured summary.
+    
+    Transcript:
+    """
+    ${transcript}
+    """
+
+    Please extract and format the following:
+    ## Summary
+    (A brief overview of the meeting)
+
+    ## Key Points
+    (Bullet points of main topics discussed)
+
+    ## Decisions
+    (Any decisions made during the meeting)
+
+    ## Action Items
+    (Actionable tasks, including who is responsible if someone was mentioned)
+
+    Return ONLY the formatted markdown text.
+  `;
+
+  try {
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    return response.text();
+  } catch (error) {
+    console.error("Error generating meeting summary:", error);
+    return "Error generating summary";
+  }
+}
+
 export async function generateGeminiResponse(prompt: string, attachment?: { data: string; mimeType: string }) {
   if (!apiKey) return "API Key missing";
   try {

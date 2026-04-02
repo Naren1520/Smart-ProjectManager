@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { chatWithAI } from '@/lib/gemini';
+import { chatWithGroq } from '@/lib/groq';
 
 export async function POST(req: Request) {
   try {
@@ -14,7 +14,7 @@ export async function POST(req: Request) {
 
     const context = history?.map((msg: any) => `${msg.role}: ${msg.content}`).join('\n') || '';
 
-    const aiResponse = await chatWithAI(message, context);
+    const aiResponse = await chatWithGroq(message, context);
 
     return NextResponse.json({ reply: aiResponse });
   } catch (error) {

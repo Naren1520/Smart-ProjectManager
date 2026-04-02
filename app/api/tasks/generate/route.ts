@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { generateTasks } from '@/lib/gemini';
+import { generateTasksWithGroq } from '@/lib/groq';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'Missing project description' }, { status: 400 });
     }
 
-    const tasks = await generateTasks(message, teamMembers || []);
+    const tasks = await generateTasksWithGroq(message, teamMembers || []);
     
     // Attempt to parse JSON response if needed, or return raw string
     try {
