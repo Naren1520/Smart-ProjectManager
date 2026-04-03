@@ -18,18 +18,19 @@ export async function generateTasks(projectDescription: string, teamMembers: any
     Here are the team members and their skills:
     ${JSON.stringify(teamMembers)}
 
-    Please break down this project into actionable tasks and assign them to the most suitable team member based on their skills.
+    Please break down this project into actionable tasks. YOU MUST assign each task ONLY to one of the specific team members listed below, matching the task requirements to their documented skills and profile. Do NOT invent new names, and do not assign tasks to anyone outside this specific list.
+
     Return a JSON array of objects with the following structure:
     [
       {
         "title": "Task Title",
         "description": "Brief description of the task",
-        "assignedTo": "Member Name",
+        "assignedTo": "Member Name from the provided list",
         "priority": "High/Medium/Low",
         "dueDate": "Estimated due date (e.g., '2 days from start')"
       }
     ]
-    Do not include any markdown formatting, just the raw JSON array.
+    Do not include any markdown formatting or \`\`\`json blocks, just the raw JSON array.
   `;
 
   try {

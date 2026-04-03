@@ -25,6 +25,7 @@ export default function ProjectWorkspace({ params }: { params: Promise<{ teamId:
   const [file, setFile] = useState<File | null>(null);
   const [fileData, setFileData] = useState<{ data: string; mimeType: string } | null>(null);
   const [isSending, setIsSending] = useState(false);
+  const [proposedTasks, setProposedTasks] = useState<any[] | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -127,13 +128,43 @@ export default function ProjectWorkspace({ params }: { params: Promise<{ teamId:
         setMessages(prev => [...prev, { role: 'ai', content: data.reply }]);
         if (data.projectUpdated) {
            setProject(data.updatedProject);
-           toast.success('Finalized and tasks distributed!');
+        }
+        if (data.proposedTasks) {
+           setProposedTasks(data.proposedTasks);
+           toast.success('Proposed tasks generated. Please approve them!');
         }
       } else {
         toast.error(data.error || 'Failed to finalize');
       }
     } catch {
       toast.error('Error finalising project');
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const handleApproveTasks = async () => {
+    if (!proposedTasks) return;
+    setIsSending(true);
+
+    try {
+      const res = await fetch(`/api/teams/${teamId}/projects/${projectId}/ai-planning`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ approve: true, proposedTasks, history: messages })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        setMessages(prev => [...prev, { role: 'ai', content: data.reply }]);
+        setProject(data.updatedProject);
+        setProposedTasks(null); // Clear after approval
+        toast.success('Tasks approved and teammates notified!');
+      } else {
+        toast.error(data.error || 'Failed to approve tasks');
+      }
+    } catch {
+      toast.error('Error approving tasks');
     } finally {
       setIsSending(false);
     }
@@ -240,11 +271,40 @@ export default function ProjectWorkspace({ params }: { params: Promise<{ teamId:
 
         {/* Task Dashboard */}
         <div className="bg-white dark:bg-neutral-900 rounded-3xl p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm flex flex-col overflow-hidden">
-           <h2 className="text-lg font-bold mb-4 flex items-center gap-2 flex-shrink-0">
-             <CheckCircle className="w-5 h-5 text-green-500" /> Distributed Tasks
-           </h2>
+           <div className="flex items-center justify-between mb-4 flex-shrink-0">
+              <h2 className="text-lg font-bold flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-green-500" /> {proposedTasks ? 'Proposed Tasks (Review)' : 'Distributed Tasks'}
+              </h2>
+              {proposedTasks && (
+                <button
+                   onClick={handleApproveTasks}
+                   disabled={isSending}
+                   className="px-3 py-1.5 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors flex items-center gap-1 shadow-sm"
+                >
+                   <CheckCircle className="w-4 h-4" /> Approve & Assign
+                </button>
+              )}
+           </div>
+           
            <div className="flex-1 overflow-y-auto space-y-3 pr-2">
-              {project?.tasks && project.tasks.length > 0 ? (
+              {proposedTasks ? (
+                 proposedTasks.map((task: any, idx: number) => (
+                    <div key={idx} className="p-4 rounded-xl bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800/50">
+                       <div className="flex justify-between items-start mb-2">
+                          <h3 className="font-semibold text-sm">{task.title}</h3>
+                          <span className="text-[10px] uppercase font-bold px-2 py-1 bg-orange-200 dark:bg-orange-800 text-orange-800 dark:text-orange-200 rounded-md">{task.priority}</span>
+                       </div>
+                       <p className="text-xs text-neutral-600 dark:text-neutral-400 mb-3">{task.description}</p>
+                       <div className="flex justify-between items-center text-xs">
+                          <div className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400">
+                             <User className="w-3.5 h-3.5" />
+                             {team?.members?.find((m:any) => m.user?._id === task.assignedTo)?.user?.name || 'Unassigned'}
+                          </div>
+                          {task.dueDate && <span className="text-orange-600 dark:text-orange-400 font-medium">Due: {new Date(task.dueDate).toLocaleDateString()}</span>}
+                       </div>
+                    </div>
+                 ))
+              ) : project?.tasks && project.tasks.length > 0 ? (
                  project.tasks.map((task: any, idx: number) => (
                     <div key={idx} className="p-4 rounded-xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700">
                        <div className="flex justify-between items-start mb-2">

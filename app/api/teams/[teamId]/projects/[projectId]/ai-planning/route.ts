@@ -19,7 +19,7 @@ export async function POST(
 
     const { teamId, projectId } = await params;
     const body = await req.json();
-    const { message, history, finalize, fileData } = body;
+    const { message, history, finalize, fileData, approve, proposedTasks } = body;
 
     await dbConnect();
     
@@ -28,6 +28,31 @@ export async function POST(
 
     if (!team || !project) {
         return NextResponse.json({ error: 'Project or team not found' }, { status: 404 });
+    }
+
+    if (approve) {
+        project.tasks = proposedTasks;
+        project.status = 'InProgress';
+        
+        let maxDeadline = new Date();
+        proposedTasks.forEach((task: any) => {
+            if (task.dueDate) {
+                const date = new Date(task.dueDate);
+                if (date > maxDeadline) maxDeadline = date;
+            }
+        });
+        project.deadline = maxDeadline;
+        
+        project.aiAnalysis = project.aiAnalysis || {};
+        project.aiAnalysis.estimatedTimeline = `Project expected to finish around ${maxDeadline.toDateString()}`;
+        
+        await project.save();
+
+        return NextResponse.json({
+           reply: "Tasks have been officially assigned and team members will be notified!",
+           projectUpdated: true,
+           updatedProject: project
+        });
     }
 
     // Identify team member skills for distribution
@@ -41,17 +66,25 @@ export async function POST(
     if (finalize) {
         // AI reads history, analyzes requirements, breaking into tasks
         const systemPrompt = `You are an expert technical project manager. A team leader is finalizing project requirements.
-Based on the chat history, your job is to distribute tasks matching the available team members' skills.
+Based on the chat history and any documents provided, your job is to distribute tasks ONLY to the team members listed below, strictly matching their specific skills and roles.
+Do not invent any fictional team members or leave tasks unassigned. Also, estimate the time and deadline for each task.
 
-Team members available: ${JSON.stringify(membersData)}
+Available Team Members: ${JSON.stringify(membersData)}
 
-Return your task distribution strictly as a JSON object (no markdown, no backticks, just raw JSON).
+Return your task distribution STRICTLY as a JSON object (no markdown, no backticks, just raw JSON).
 Structure:
 {
-  "reply": "Summary message to the leader",
-  "projectUpdated": true,
+  "reply": "Here are the proposed tasks. Please tick right (approve) to distribute them.",
+  "projectUpdated": false,
   "tasks": [
-    { "title": "Task Name", "description": "Details", "status": "Pending", "assignedTo": "User ID matching the right skill", "priority": "High/Medium/Low" }
+    { 
+       "title": "Task Name", 
+       "description": "Details", 
+       "status": "Pending", 
+       "assignedTo": "User ID matching the right skill from the Available Team Members list", 
+       "priority": "High/Medium/Low",
+       "dueDate": "YYYY-MM-DD"
+    }
   ]
 }`;
 
@@ -62,15 +95,11 @@ Structure:
             // Strip out markdown if api accidentally returns it
             const cleanedText = aiResponse.replace(/```json/g, '').replace(/```/g, '');
             const parsedData = JSON.parse(cleanedText);
-            
-            project.tasks = parsedData.tasks;
-            project.status = 'InProgress';
-            await project.save();
 
             return NextResponse.json({
-               reply: parsedData.reply || "Tasks finalized and distributed!",
-               projectUpdated: true,
-               updatedProject: project
+               reply: parsedData.reply || "Proposed tasks generated. Please approve to distribute.",
+               proposedTasks: parsedData.tasks,
+               projectUpdated: false
             });
         } catch(err) {
             console.log(err, aiResponse);
@@ -80,7 +109,10 @@ Structure:
         // Normal interactive chat mode
         const systemPrompt = `You are an AI Product Management Assistant helping a team leader define project requirements.
 Read their inputs, clarify doubts, and ask engaging questions. Ask if they want to finalize or make changes. Keep your responses short and friendly like a WhatsApp chat.
-Do not distribute tasks yet; wait until they are ready to finalize.`;
+Do not distribute tasks yet; wait until they are ready to finalize.
+IMPORTANT: You already have the list of team members and their skills provided below. DO NOT ask the user for information about their team's skills, roles, or who is in the team.
+
+Available Team Members: ${JSON.stringify(membersData)}`;
         
         // build context
         const context = history.map((mh: any) => `${mh.role}: ${mh.content}`).join('\n');
