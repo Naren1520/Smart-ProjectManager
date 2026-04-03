@@ -12,8 +12,10 @@ In hackathons and fast-paced development environments, forming the right team an
 
 ##  Key Features
 
-###  AI-Powered Project Management
-- **Smart Task Allocation**: Uses Google's **Gemini 1.5 Flash** to analyze project descriptions and team members' skills, automatically generating and assigning tasks to the most suitable person.
+###  AI-Powered Project Management & Planning
+- **Smart Task Allocation**: Uses **Google Gemini 2.5 Flash** to analyze project conversations, chat history, and attached files to automatically distribute tasks.
+- **Strict Skill Matching**: AI assigns tasks *strictly* to existing team members based on their actual skills without hallucinating.
+- **Lead Approval Workflow**: The AI proposes task distribution and deadlines. The Team Lead reviews the generated tasks and clicks "Approve & Assign" to officially dispatch them and notify the team.
 - **Skill Mapping**: Visualize team strengths with dynamic radar charts based on user profiles.
 
 ###  Gamification & Rewards
@@ -37,13 +39,14 @@ In hackathons and fast-paced development environments, forming the right team an
 
 ##  Tech Stack
 
-- **Frontend**: [Next.js 15](https://nextjs.org/) (App Router, Server Components), [React](https://react.dev/)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/), [Framer Motion](https://www.framer.com/motion/) (Animations)
+- **Frontend**: [Next.js 16](https://nextjs.org/) (App Router, Server Components, Turbopack), [React 19](https://react.dev/)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/), [Framer Motion](https://www.framer.com/motion/) (Animations)
 - **Backend**: Next.js API Routes (Serverless)
 - **Database**: [MongoDB](https://www.mongodb.com/) (Mongoose ODM)
 - **Authentication**: [NextAuth.js](https://next-auth.js.org/) (Google OAuth)
-- **AI Model**: [Google Gemini 1.5 Flash](https://deepmind.google/technologies/gemini/)
+- **AI Models**: [Google Gemini 2.5 Flash](https://deepmind.google/technologies/gemini/) & **Groq** (`groq-sdk`)
 - **PDF Generation**: [jsPDF](https://github.com/parallax/jsPDF) (Client-side vector generation)
+- **Sockets**: [Socket.io](https://socket.io/) (Real-time collaboration)
 - **Icons**: [Lucide React](https://lucide.dev/)
 
 ---
@@ -53,9 +56,10 @@ In hackathons and fast-paced development environments, forming the right team an
 Follow these steps to set up the project locally.
 
 ### Prerequisites
-- Node.js 18+ 
+- Node.js 20+ 
 - MongoDB Instance (Local or Atlas)
 - Google Cloud Console Account (for OAuth & Gemini API)
+- Groq Console Account (for Groq API integrations)
 
 ### Installation
 
@@ -87,6 +91,7 @@ Follow these steps to set up the project locally.
 
    # AI Configuration
    GEMINI_API_KEY=your_gemini_api_key
+   GROQ_API_KEY=your_groq_api_key
    ```
 
 4. **Run the development server**
@@ -112,7 +117,7 @@ Follow these steps to set up the project locally.
 ##  Challenges We Ran Into
 
 - **PDF Generation**: We initially struggled with `html2canvas` for generating certificates, as it failed to capture complex CSS styles and high-resolution images accurately. We pivoted to a **vector-based approach using `jsPDF`**, manually drawing the certificate layout and implementing custom canvas clipping for circular user avatars/logos to ensure pixel-perfect, printable results.
-- **AI Consistency**: Tuning the prompt for Gemini 1.5 Flash to consistently output structured JSON for task allocation required several iterations of prompt engineering.
+- **AI Consistency**: Tuning the prompt for Gemini 2.5 Flash to consistently output strictly formatted JSON mapping only to actual team members without hallucinating names. Implementing an intermediary "Task Proposal" step before pushing to the DB took several iterations of prompt engineering.
 
 ---
 
