@@ -12,6 +12,7 @@ const ProjectSchema = new mongoose.Schema({
     status: { type: String, enum: ['Pending', 'InProgress', 'Completed'], default: 'Pending' },
     assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     dueDate: { type: Date },
+    estimatedTime: { type: String },
     priority: { type: String, enum: ['Low', 'Medium', 'High'], default: 'Medium' },
   }],
   aiAnalysis: {

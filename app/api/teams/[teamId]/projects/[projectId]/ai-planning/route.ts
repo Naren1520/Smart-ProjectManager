@@ -5,6 +5,7 @@ import dbConnect from '@/lib/mongodb';
 import Project from '@/models/Project';
 import Team from '@/models/Team';
 import User from '@/models/User';
+import DirectMessage from '@/models/DirectMessage';
 import { generateGeminiResponse } from '@/lib/gemini';
 
 export async function POST(
@@ -25,13 +26,17 @@ export async function POST(
     
     const team = await Team.findById(teamId).populate('members.user');
     const project = await Project.findById(projectId);
+    const leader = await User.findOne({ email: session.user.email });
 
-    if (!team || !project) {
-        return NextResponse.json({ error: 'Project or team not found' }, { status: 404 });
+    if (!team || !project || !leader) {
+        return NextResponse.json({ error: 'Project, team, or user not found' }, { status: 404 });
     }
 
     if (approve) {
-        project.tasks = proposedTasks;
+        if (!project.tasks) {
+            project.tasks = [];
+        }
+        project.tasks.push(...proposedTasks);
         project.status = 'InProgress';
         
         let maxDeadline = new Date();
@@ -48,8 +53,27 @@ export async function POST(
         
         await project.save();
 
+        // Use Gemini API to send personalized messages to each assigned member with estimated time
+        for (const task of proposedTasks) {
+            if (task.assignedTo && task.estimatedTime) {
+                try {
+                    const msgPrompt = `You are an AI assistant helping a project leader. Write a short, friendly direct message (1-2 sentences) to a team member who has just been assigned the task "${task.title}" for the project "${project.title}". Strongly emphasize the required task and explicitly mention the estimated completion time of "${task.estimatedTime}". Do not use markdown formatting or placeholders.`;
+                    const personalizedMessage = await generateGeminiResponse(msgPrompt);
+                    
+                    const newDM = new DirectMessage({
+                        sender: leader._id,
+                        receiver: task.assignedTo,
+                        content: personalizedMessage
+                    });
+                    await newDM.save();
+                } catch(e) {
+                    console.error('Failed to send task notification:', e);
+                }
+            }
+        }
+
         return NextResponse.json({
-           reply: "Tasks have been officially assigned and team members will be notified!",
+           reply: "Tasks have been officially assigned and team members have been notified via direct messages!",
            projectUpdated: true,
            updatedProject: project
         });
@@ -67,7 +91,7 @@ export async function POST(
         // AI reads history, analyzes requirements, breaking into tasks
         const systemPrompt = `You are an expert technical project manager. A team leader is finalizing project requirements.
 Based on the chat history and any documents provided, your job is to distribute tasks ONLY to the team members listed below, strictly matching their specific skills and roles.
-Do not invent any fictional team members or leave tasks unassigned. Also, estimate the time and deadline for each task.
+Do not invent any fictional team members or leave tasks unassigned. Also, GUESS the estimated time needed to work on that task based on its complexity.
 
 Available Team Members: ${JSON.stringify(membersData)}
 
@@ -83,7 +107,8 @@ Structure:
        "status": "Pending", 
        "assignedTo": "User ID matching the right skill from the Available Team Members list", 
        "priority": "High/Medium/Low",
-       "dueDate": "YYYY-MM-DD"
+       "dueDate": "YYYY-MM-DD",
+       "estimatedTime": "e.g., 4 hours, 2 days, 1 week"
     }
   ]
 }`;

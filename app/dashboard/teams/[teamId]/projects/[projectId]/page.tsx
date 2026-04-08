@@ -2,7 +2,7 @@
 import { useState, useEffect, use, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { Bot, Send, User, CheckCircle, FileText, Loader2, RefreshCw, Paperclip } from 'lucide-react';
+import { Bot, Send, User, CheckCircle, FileText, Loader2, RefreshCw, Paperclip, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Loader } from '@/components/Loader';
 
@@ -17,6 +17,8 @@ export default function ProjectWorkspace({ params }: { params: Promise<{ teamId:
   const [project, setProject] = useState<any>(null);
   const [team, setTeam] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+
+  const isLeader = team?.members?.find((m: any) => m.user?.email === session?.user?.email)?.role === 'Leader';
   
   const [messages, setMessages] = useState<Message[]>([
     { role: 'ai', content: "Hello! I am ready to help you plan this project. Please describe your project idea, requirements, or upload any context you have. Once we finalize the scope, I will look at your team's skills and distribute the tasks automatically." }
@@ -170,6 +172,24 @@ export default function ProjectWorkspace({ params }: { params: Promise<{ teamId:
     }
   };
 
+  const handleDeleteTask = async (taskId: string) => {
+    if (!confirm('Are you sure you want to delete this task?')) return;
+    try {
+      const res = await fetch(`/api/teams/${teamId}/projects/${projectId}/tasks/${taskId}`, {
+        method: 'DELETE'
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setProject(data.project);
+        toast.success('Task deleted successfully');
+      } else {
+        toast.error('Failed to delete task');
+      }
+    } catch {
+      toast.error('Error deleting task');
+    }
+  };
+
   if (loading) return <Loader />;
   if (!project) return <div className="p-8">Project not found</div>;
 
@@ -295,6 +315,7 @@ export default function ProjectWorkspace({ params }: { params: Promise<{ teamId:
                           <span className="text-[10px] uppercase font-bold px-2 py-1 bg-orange-200 dark:bg-orange-800 text-orange-800 dark:text-orange-200 rounded-md">{task.priority}</span>
                        </div>
                        <p className="text-xs text-neutral-600 dark:text-neutral-400 mb-3">{task.description}</p>
+                       {task.estimatedTime && <p className="text-[11px] text-indigo-600 dark:text-indigo-400 mb-2 font-medium">Estimated Time: {task.estimatedTime}</p>}
                        <div className="flex justify-between items-center text-xs">
                           <div className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400">
                              <User className="w-3.5 h-3.5" />
@@ -309,9 +330,21 @@ export default function ProjectWorkspace({ params }: { params: Promise<{ teamId:
                     <div key={idx} className="p-4 rounded-xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700">
                        <div className="flex justify-between items-start mb-2">
                           <h3 className="font-semibold text-sm">{task.title}</h3>
-                          <span className="text-[10px] uppercase font-bold px-2 py-1 bg-neutral-200 dark:bg-neutral-700 rounded-md">{task.priority}</span>
+                          <div className="flex items-center gap-2">
+                             <span className="text-[10px] uppercase font-bold px-2 py-1 bg-neutral-200 dark:bg-neutral-700 rounded-md">{task.priority}</span>
+                             {isLeader && (
+                               <button 
+                                 onClick={() => handleDeleteTask(task._id)}
+                                 className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1 rounded transition-colors"
+                                 title="Delete Task"
+                               >
+                                 <Trash2 className="w-4 h-4" />
+                               </button>
+                             )}
+                          </div>
                        </div>
                        <p className="text-xs text-neutral-500 mb-3">{task.description}</p>
+                       {task.estimatedTime && <p className="text-[11px] text-indigo-600 dark:text-indigo-400 mb-2 font-medium">Estimated Time: {task.estimatedTime}</p>}
                        <div className="flex justify-between items-center text-xs">
                           <div className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400">
                              <User className="w-3.5 h-3.5" />
