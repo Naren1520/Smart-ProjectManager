@@ -31,6 +31,33 @@ export default function ProjectWorkspace({ params }: { params: Promise<{ teamId:
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    if (projectId) {
+      const saved = localStorage.getItem(`teamProjectChat_${projectId}`);
+      if (saved) {
+        try {
+          setMessages(JSON.parse(saved));
+        } catch (e) {
+          console.error('Failed to parse saved chat');
+        }
+      }
+    }
+  }, [projectId]);
+
+  useEffect(() => {
+    if (projectId && (messages.length > 1 || (messages.length === 1 && (messages[0].role !== 'ai' || messages[0].content !== "Hello! I am ready to help you plan this project. Please describe your project idea, requirements, or upload any context you have. Once we finalize the scope, I will look at your team's skills and distribute the tasks automatically.")))) {
+      localStorage.setItem(`teamProjectChat_${projectId}`, JSON.stringify(messages));
+    }
+  }, [messages, projectId]);
+
+  const clearChat = () => {
+    if (confirm("Are you sure you want to delete the chat history?")) {
+      const initial = [{ role: 'ai' as const, content: "Hello! I am ready to help you plan this project. Please describe your project idea, requirements, or upload any context you have. Once we finalize the scope, I will look at your team's skills and distribute the tasks automatically." }];
+      setMessages(initial);
+      localStorage.removeItem(`teamProjectChat_${projectId}`);
+    }
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
@@ -190,6 +217,34 @@ export default function ProjectWorkspace({ params }: { params: Promise<{ teamId:
     }
   };
 
+  const handleResetProject = async () => {
+    if (!confirm('Are you sure you want to hard reset this project? This will clear ALL assigned tasks and the AI chat history, allowing you to use this space for a new project in the same team.')) return;
+    setIsSending(true);
+
+    try {
+      const res = await fetch(`/api/teams/${teamId}/projects/${projectId}/ai-planning`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reset: true })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        localStorage.removeItem(`teamProjectChat_${projectId}`);
+        setMessages([{ role: 'ai', content: data.reply }]);
+        setProject(data.updatedProject);
+        setProposedTasks(null);
+        toast.success('Project workspace reset successfully!');
+      } else {
+        toast.error(data.error || 'Failed to reset project');
+      }
+    } catch {
+      toast.error('Error resetting project');
+    } finally {
+      setIsSending(false);
+    }
+  };
+
   if (loading) return <Loader />;
   if (!project) return <div className="p-8">Project not found</div>;
 
@@ -200,7 +255,17 @@ export default function ProjectWorkspace({ params }: { params: Promise<{ teamId:
           <h1 className="text-2xl font-bold text-neutral-900 dark:text-white">{project.title}</h1>
           <p className="text-neutral-500">{project.description}</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-4">
+           {isLeader && (
+             <button
+                onClick={handleResetProject}
+                disabled={isSending}
+                className="text-red-500 text-sm font-medium hover:bg-red-50 dark:hover:bg-red-900/20 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5"
+                title="Reset Project"
+             >
+                <Trash2 className="w-4 h-4" /> Hard Reset
+             </button>
+           )}
            <div className={`px-3 py-1 rounded-full text-sm font-medium ${
                  project.status === 'Planning' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30' : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30'
            }`}>
@@ -218,13 +283,23 @@ export default function ProjectWorkspace({ params }: { params: Promise<{ teamId:
                 <Bot className="w-5 h-5 text-indigo-500" />
                 AI Planning Assistant
              </h2>
-             <button
-               onClick={handleFinalize}
-               disabled={isSending || (project.tasks && project.tasks.length > 0)}
-               className="px-4 py-1.5 bg-indigo-600 text-white text-sm rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50 flex items-center gap-2"
-             >
-               <RefreshCw className="w-4 h-4" /> Finalize & Distribute
-             </button>
+             <div className="flex items-center gap-2">
+               <button
+                 onClick={clearChat}
+                 disabled={messages.length <= 1}
+                 className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                 title="Clear chat"
+               >
+                 <Trash2 className="w-4 h-4" />
+               </button>
+               <button
+                 onClick={handleFinalize}
+                 disabled={isSending || (project.tasks && project.tasks.length > 0)}
+                 className="px-4 py-1.5 bg-indigo-600 text-white text-sm rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+               >
+                 <RefreshCw className="w-4 h-4" /> Finalize & Distribute
+               </button>
+             </div>
            </div>
            
            <div className="flex-1 overflow-y-auto p-4 space-y-4">

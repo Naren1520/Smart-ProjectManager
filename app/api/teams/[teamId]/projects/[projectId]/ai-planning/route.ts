@@ -20,7 +20,7 @@ export async function POST(
 
     const { teamId, projectId } = await params;
     const body = await req.json();
-    const { message, history, finalize, fileData, approve, proposedTasks } = body;
+    const { message, history, finalize, fileData, approve, proposedTasks, reset } = body;
 
     await dbConnect();
     
@@ -30,6 +30,19 @@ export async function POST(
 
     if (!team || !project || !leader) {
         return NextResponse.json({ error: 'Project, team, or user not found' }, { status: 404 });
+    }
+
+    if (reset) {
+        project.tasks = [];
+        project.status = 'Planning';
+        project.aiAnalysis = {};
+        await project.save();
+        
+        return NextResponse.json({
+            reply: "Project workspace has been completely reset. All tasks are cleared, and we are back to the planning phase. How would you like to start planning your new goals?",
+            projectUpdated: true,
+            updatedProject: project
+        });
     }
 
     if (approve) {

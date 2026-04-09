@@ -12,6 +12,7 @@ import {
   CheckCircle2,
   MessageSquare,
   Send,
+  Trash2,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -59,6 +60,31 @@ export default function AIToolsPage() {
   const [chatInput, setChatInput] = useState("");
   const [isChatSeding, setIsChatSending] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("aiAssistantChat");
+    if (saved) {
+      try {
+        setChatMessages(JSON.parse(saved));
+      } catch (e) {
+        console.error("Failed to parse saved chat");
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (chatMessages.length > 1 || (chatMessages.length === 1 && chatMessages[0].role !== "ai" || chatMessages[0].content !== "Hello! I'm your AI Assistant. How can I help you today?")) {
+      localStorage.setItem("aiAssistantChat", JSON.stringify(chatMessages));
+    }
+  }, [chatMessages]);
+
+  const clearChat = () => {
+    if (confirm("Are you sure you want to delete the chat history?")) {
+      const initial = [{ role: "ai" as const, content: "Hello! I'm your AI Assistant. How can I help you today?" }];
+      setChatMessages(initial);
+      localStorage.removeItem("aiAssistantChat");
+    }
+  };
 
   useEffect(() => {
     if (activeTab === "assistant") {
@@ -558,6 +584,21 @@ export default function AIToolsPage() {
             exit={{ opacity: 0, y: -20 }}
             className="h-[calc(100vh-14rem)] min-h-[500px] md:h-[600px] flex flex-col bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl overflow-hidden shadow-sm w-full max-w-4xl mx-auto"
           >
+            <div className="flex items-center justify-between p-4 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/50">
+              <h3 className="font-semibold flex items-center gap-2">
+                <Bot className="w-5 h-5 text-blue-600" />
+                AI Assistant
+              </h3>
+              <button
+                onClick={clearChat}
+                disabled={chatMessages.length <= 1}
+                className="text-sm p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg flex items-center gap-1.5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Clear chat"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span className="hidden sm:inline">Clear Chat</span>
+              </button>
+            </div>
             <div className="flex-1 p-4 md:p-6 overflow-y-auto space-y-4">
               {chatMessages.map((msg, idx) => (
                 <div
