@@ -2,6 +2,7 @@
 import { useState, useEffect, use, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import { useTheme } from 'next-themes';
 import { Bot, Send, User, CheckCircle, FileText, Loader2, RefreshCw, Paperclip, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Loader } from '@/components/Loader';
@@ -14,6 +15,7 @@ interface Message {
 export default function ProjectWorkspace({ params }: { params: Promise<{ teamId: string; projectId: string }> }) {
   const { teamId, projectId } = use(params);
   const { data: session } = useSession();
+  const { theme } = useTheme();
   const [project, setProject] = useState<any>(null);
   const [team, setTeam] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -295,7 +297,11 @@ export default function ProjectWorkspace({ params }: { params: Promise<{ teamId:
                <button
                  onClick={handleFinalize}
                  disabled={isSending || (project.tasks && project.tasks.length > 0)}
-                 className="px-4 py-1.5 bg-indigo-600 text-white text-sm rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+                 className={`px-4 py-1.5 text-sm rounded-xl transition-colors disabled:opacity-50 flex items-center gap-2 ${
+                   theme === 'dark'
+                     ? 'bg-white hover:bg-neutral-100 text-black'
+                     : 'bg-black hover:bg-neutral-800 text-white'
+                 }`}
                >
                  <RefreshCw className="w-4 h-4" /> Finalize & Distribute
                </button>
@@ -355,7 +361,11 @@ export default function ProjectWorkspace({ params }: { params: Promise<{ teamId:
                      <button
                        type="submit"
                        disabled={(!input.trim() && !file) || isSending}
-                       className="absolute right-2 bottom-2 p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                       className={`absolute right-2 bottom-2 p-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors ${
+                         theme === 'dark'
+                           ? 'bg-white hover:bg-neutral-100 text-black'
+                           : 'bg-black hover:bg-neutral-800 text-white'
+                       }`}
                      >
                        <Send className="w-4 h-4" />
                      </button>
@@ -374,7 +384,11 @@ export default function ProjectWorkspace({ params }: { params: Promise<{ teamId:
                 <button
                    onClick={handleApproveTasks}
                    disabled={isSending}
-                   className="px-3 py-1.5 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors flex items-center gap-1 shadow-sm"
+                   className={`px-3 py-1.5 text-sm rounded-lg transition-colors flex items-center gap-1 shadow-sm ${
+                     theme === 'dark'
+                       ? 'bg-white hover:bg-neutral-100 text-black'
+                       : 'bg-black hover:bg-neutral-800 text-white'
+                   }`}
                 >
                    <CheckCircle className="w-4 h-4" /> Approve & Assign
                 </button>

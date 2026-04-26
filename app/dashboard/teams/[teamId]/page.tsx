@@ -3,6 +3,7 @@
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import { useTheme } from 'next-themes';
 import { 
     Users, Plus, Brain, Calendar, Clock, ArrowRight, UserPlus, FileText, CheckCircle, Trash2, Copy, MessageSquare
 } from 'lucide-react';
@@ -31,6 +32,7 @@ export default function TeamDetailsPage({ params }: { params: Promise<{ teamId: 
     const { data: session } = useSession();
     const { teamId } = use(params);
     const router = useRouter();
+    const { theme } = useTheme();
     const [team, setTeam] = useState<Team | null>(null);
     const [projects, setProjects] = useState<Project[]>([]);
     const [loading, setLoading] = useState(true);
@@ -157,7 +159,11 @@ export default function TeamDetailsPage({ params }: { params: Promise<{ teamId: 
                         <UserPlus className="w-4 h-4" />
                         Manage Members
                     </Link>
-                    <button onClick={() => setIsCreateProjectModalOpen(true)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20">
+                    <button onClick={() => setIsCreateProjectModalOpen(true)} className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-colors shadow-lg ${
+                        theme === 'dark'
+                            ? 'bg-white hover:bg-neutral-100 text-black shadow-white/20'
+                            : 'bg-black hover:bg-neutral-800 text-white shadow-black/20'
+                    }`}>
                         <Plus className="w-4 h-4" />
                         New Project
                     </button>
@@ -352,7 +358,11 @@ export default function TeamDetailsPage({ params }: { params: Promise<{ teamId: 
                                 <button
                                     type="submit"
                                     disabled={isCreatingProject}
-                                    className="px-6 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                    className={`px-6 py-2 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 ${
+                                        theme === 'dark'
+                                            ? 'bg-white hover:bg-neutral-100 text-black'
+                                            : 'bg-black hover:bg-neutral-800 text-white'
+                                    }`}
                                 >
                                     {isCreatingProject ? <Loader /> : 'Create Project'}
                                 </button>

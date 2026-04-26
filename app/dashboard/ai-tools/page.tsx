@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
+import { useTheme } from "next-themes";
 import {
   Bot,
   FileText,
@@ -18,6 +19,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export default function AIToolsPage() {
   const { data: session } = useSession();
+  const { theme } = useTheme();
   const [activeTab, setActiveTab] = useState<"tasks" | "resume" | "assistant">(
     "tasks",
   );
@@ -309,7 +311,11 @@ export default function AIToolsPage() {
                 <button
                   onClick={generateTasks}
                   disabled={isGeneratingTasks || !projectDesc.trim()}
-                  className="mt-4 w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-500/20"
+                  className={`mt-4 w-full py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition-all shadow-lg ${
+                    theme === 'dark'
+                      ? 'bg-white hover:bg-neutral-100 disabled:opacity-50 disabled:cursor-not-allowed text-black shadow-white/20'
+                      : 'bg-black hover:bg-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed text-white shadow-black/20'
+                  }`}
                 >
                   {isGeneratingTasks ? (
                     <>
@@ -435,7 +441,11 @@ export default function AIToolsPage() {
                   disabled={
                     isAnalyzingResume || (!resumeText.trim() && !resumeFile)
                   }
-                  className="mt-4 w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-500/20"
+                  className={`mt-4 w-full py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition-all shadow-lg ${
+                    theme === 'dark'
+                      ? 'bg-white hover:bg-neutral-100 disabled:opacity-50 disabled:cursor-not-allowed text-black shadow-white/20'
+                      : 'bg-black hover:bg-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed text-white shadow-black/20'
+                  }`}
                 >
                   {isAnalyzingResume ? (
                     <>
