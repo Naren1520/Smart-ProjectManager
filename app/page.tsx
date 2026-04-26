@@ -48,11 +48,11 @@ export default function Home() {
               className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/10 border border-black/20 backdrop-blur-md text-sm text-black mb-8"
             >
               <span className="w-2 h-2 rounded-full bg-black animate-pulse" />
-              TeamForge AI 2.0 is Here
+              TeamForge AI 1.0 is Here
             </motion.div>
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4 text-black leading-[1.1]">
-              Manage Projects at <br className="hidden md:block"/> Light Speed with AI
+              Manage Projects <br className="hidden md:block"/>  with AI
             </h1>
 
             <p className="text-base md:text-lg text-slate-600 mb-8 leading-relaxed max-w-xl">
