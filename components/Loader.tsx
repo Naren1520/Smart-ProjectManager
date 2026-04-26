@@ -32,7 +32,7 @@ export function Loader() {
             times: [0, 0.5, 1],
             repeat: Infinity
           }}
-          className="w-16 h-16 bg-gradient-to-bl from-blue-600 to-violet-600 rounded-xl shadow-lg shadow-blue-500/30"
+          className="w-16 h-16 bg-gradient-to-bl from-gray-600 to-black rounded-xl shadow-lg shadow-blue-500/30"
         />
         <div className="absolute inset-0 flex items-center justify-center text-white font-bold text-xs">
           AI
