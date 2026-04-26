@@ -34,7 +34,7 @@ export default function ProjectsClient({ initialProjects }: ProjectsClientProps)
           <h1 className="text-3xl font-bold mb-2">Projects</h1>
           <p className="text-neutral-500">Manage and track your team&apos;s ongoing projects.</p>
         </div>
-        <Link href="/dashboard/projects/create" className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-medium flex items-center gap-2 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all">
+        <Link href="/dashboard/projects/create" className="bg-black dark:bg-white hover:bg-neutral-800 dark:hover:bg-neutral-200 text-white dark:text-black px-6 py-3 rounded-xl font-medium flex items-center gap-2 shadow-lg shadow-black/20 dark:shadow-white/20 hover:shadow-black/30 dark:hover:shadow-white/30 transition-all">
           <Plus className="w-5 h-5" />
           New Project
         </Link>
@@ -47,7 +47,7 @@ export default function ProjectsClient({ initialProjects }: ProjectsClientProps)
           placeholder="Search projects..." 
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl py-3 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+          className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl py-3 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-black/50 dark:focus:ring-white/50 transition-all"
         />
       </div>
 
@@ -57,7 +57,7 @@ export default function ProjectsClient({ initialProjects }: ProjectsClientProps)
             <Link href={`/dashboard/projects/${project._id}`} key={project._id} className="block group">
               <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-6 hover:shadow-xl transition-all hover:border-blue-500/30 h-full flex flex-col">
                 <div className="flex justify-between items-start mb-4">
-                  <div className="p-3 bg-blue-500/10 text-blue-600 rounded-xl group-hover:bg-blue-500 group-hover:text-white transition-colors">
+                  <div className="p-3 bg-black/10 dark:bg-white/10 text-black dark:text-white rounded-xl group-hover:bg-black dark:group-hover:bg-white group-hover:text-white dark:group-hover:text-black transition-colors">
                     <FolderKanban className="w-6 h-6" />
                   </div>
                   {/* <button className="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200">
@@ -65,7 +65,7 @@ export default function ProjectsClient({ initialProjects }: ProjectsClientProps)
                   </button> */}
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                     project.status === 'Completed' ? 'bg-green-100 text-green-700' :
-                    project.status === 'InProgress' ? 'bg-blue-100 text-blue-700' :
+                    project.status === 'InProgress' ? 'bg-neutral-200 dark:bg-neutral-700 text-black dark:text-white' :
                     project.status === 'Planning' ? 'bg-purple-100 text-purple-700' :
                     project.status === 'OnHold' ? 'bg-amber-100 text-amber-700' :
                     'bg-gray-100 text-gray-700'
@@ -86,7 +86,7 @@ export default function ProjectsClient({ initialProjects }: ProjectsClientProps)
                   </div>
                   <div className="h-2 w-full bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-blue-500 rounded-full transition-all duration-1000 ease-out"
+                      className="h-full bg-black dark:bg-white rounded-full transition-all duration-1000 ease-out"
                       style={{ width: `${project.progress}%` }}
                     />
                   </div>
@@ -111,7 +111,7 @@ export default function ProjectsClient({ initialProjects }: ProjectsClientProps)
           <FolderKanban className="w-12 h-12 mx-auto mb-4 text-neutral-300" />
           <h3 className="text-lg font-medium mb-1">No projects found</h3>
           <p className="max-w-sm mx-auto mb-6">Get started by creating a new project for your team.</p>
-          <Link href="/dashboard/projects/create" className="text-blue-600 hover:text-blue-700 font-medium">
+            <Link href="/dashboard/projects/create" className="text-black dark:text-white hover:underline font-medium">
             Create your first project →
           </Link>
         </div>

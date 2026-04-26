@@ -45,7 +45,7 @@ export default function CreateTeamPage() {
         </Link>
         
         <div className="bg-white dark:bg-neutral-900 rounded-3xl p-8 border border-neutral-200 dark:border-neutral-800 shadow-xl">
-            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center text-blue-600 dark:text-blue-400 mb-6">
+            <div className="w-12 h-12 bg-neutral-200 dark:bg-neutral-700 rounded-2xl flex items-center justify-center text-black dark:text-white mb-6">
                 <UserPlus className="w-6 h-6" />
             </div>
             
@@ -80,7 +80,7 @@ export default function CreateTeamPage() {
                 <button 
                     type="submit" 
                     disabled={loading}
-                    className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold shadow-lg shadow-blue-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full py-4 bg-black dark:bg-white hover:bg-neutral-800 dark:hover:bg-neutral-200 text-white dark:text-black rounded-xl font-semibold shadow-lg shadow-black/30 dark:shadow-white/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {loading ? 'Creating Workspace...' : 'Create Team'}
                 </button>

@@ -96,7 +96,7 @@ export default async function DashboardPage() {
             You have <span className="text-neutral-900 dark:text-neutral-100 font-medium">{activeProjects} active projects</span> and <span className="text-neutral-900 dark:text-neutral-100 font-medium">{totalTasks - completedTasks} pending tasks</span>.
           </p>
           <div className="mt-6 flex flex-wrap gap-4">
-            <Link href="/dashboard/projects/create" className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg shadow-blue-500/30 transition-all font-medium">
+            <Link href="/dashboard/projects/create" className="px-5 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-xl shadow-lg shadow-black/30 dark:shadow-white/30 transition-all font-medium hover:bg-neutral-800 dark:hover:bg-neutral-200">
               Create New Project
             </Link>
             <Link href="/dashboard/teams/join" className="px-5 py-2.5 bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-700 rounded-xl transition-all font-medium">
@@ -110,8 +110,8 @@ export default async function DashboardPage() {
           {[
             { label: 'Pending Tasks', value: (totalTasks - completedTasks).toString(), icon: Clock, color: 'text-amber-500 bg-amber-50 dark:bg-amber-900/20' },
             { label: 'Completed', value: completedTasks.toString(), icon: CheckCircle, color: 'text-emerald-500 bg-emerald-50 dark:bg-emerald-900/20' },
-            { label: 'Active Projects', value: activeProjects.toString(), icon: FolderKanban, color: 'text-blue-500 bg-blue-50 dark:bg-blue-900/20' },
-            { label: 'Efficiency', value: `${efficiency}%`, icon: TrendingUp, color: 'text-purple-500 bg-purple-50 dark:bg-purple-900/20' },
+            { label: 'Active Projects', value: activeProjects.toString(), icon: FolderKanban, color: 'text-black dark:text-white bg-neutral-100 dark:bg-neutral-800' },
+            { label: 'Efficiency', value: `${efficiency}%`, icon: TrendingUp, color: 'text-black dark:text-white bg-neutral-100 dark:bg-neutral-800' },
           ].map((stat) => (
             <div key={stat.label} className="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-2xl p-4 flex flex-col items-center justify-center text-center gap-2 shadow-sm">
               <div className={`p-3 rounded-full ${stat.color}`}>
@@ -143,7 +143,7 @@ export default async function DashboardPage() {
                     GitHub Activity & Stats
                 </h3>
                 {user.githubProfile.username && (
-                  <Link href={`https://github.com/${user.githubProfile.username}`} target="_blank" className="flex items-center gap-1 text-sm text-blue-500 hover:underline">
+                  <Link href={`https://github.com/${user.githubProfile.username}`} target="_blank" className="flex items-center gap-1 text-sm text-black dark:text-white hover:underline">
                     View Profile
                     <TrendingUp className="w-3 h-3" />
                   </Link>
@@ -152,7 +152,7 @@ export default async function DashboardPage() {
 
              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
                  <div className="p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl border border-neutral-100 dark:border-neutral-800 flex items-center gap-3">
-                    <div className="p-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-lg">
+                    <div className="p-2 bg-neutral-200 dark:bg-neutral-700 text-black dark:text-white rounded-lg">
                       <FolderKanban className="w-5 h-5" />
                     </div>
                     <div>
@@ -161,7 +161,7 @@ export default async function DashboardPage() {
                     </div>
                  </div>
                  <div className="p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl border border-neutral-100 dark:border-neutral-800 flex items-center gap-3">
-                    <div className="p-2 bg-purple-100 dark:bg-purple-900/30 text-purple-600 rounded-lg">
+                    <div className="p-2 bg-neutral-200 dark:bg-neutral-700 text-black dark:text-white rounded-lg">
                       <Users className="w-5 h-5" />
                     </div>
                     <div>
@@ -227,13 +227,13 @@ export default async function DashboardPage() {
       <div className="col-span-full bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-2xl p-6 shadow-sm">
         <div className="flex justify-between items-center mb-6">
             <h3 className="text-lg font-semibold">Recent Projects</h3>
-            <Link href="/dashboard/projects" className="text-sm text-blue-600 hover:underline">View All</Link>
+            <Link href="/dashboard/projects" className="text-sm text-black dark:text-white hover:underline">View All</Link>
         </div>
         <div className="space-y-4">
             {projects.length > 0 ? projects.slice(0, 3).map((project: any) => (
                 <Link key={project._id.toString()} href={`/dashboard/projects/${project._id}`}>
                 <div className="flex items-center gap-4 p-4 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 rounded-xl transition-colors border border-transparent hover:border-neutral-100 dark:hover:border-neutral-800 cursor-pointer">
-                    <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-lg">
+                    <div className="w-12 h-12 bg-neutral-200 dark:bg-neutral-700 rounded-lg flex items-center justify-center text-black dark:text-white font-bold text-lg">
                         {project.title.substring(0, 2).toUpperCase()}
                     </div>
                     <div className="flex-1">

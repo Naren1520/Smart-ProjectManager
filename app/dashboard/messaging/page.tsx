@@ -57,7 +57,7 @@ export default function MessagingPage() {
       <div className="flex flex-col md:flex-row gap-6 justify-between items-start md:items-center bg-white dark:bg-neutral-900 p-8 rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-sm shrink-0">
         <div>
           <h1 className="text-3xl font-bold mb-2 text-neutral-900 dark:text-white flex items-center gap-3">
-            <MessageCircle className="w-8 h-8 text-indigo-500" />
+            <MessageCircle className="w-8 h-8 text-black dark:text-white" />
             Direct Messaging
           </h1>
           <p className="text-neutral-500 dark:text-neutral-400">Connect privately with anyone using their Unique ID</p>
@@ -70,7 +70,7 @@ export default function MessagingPage() {
              onChange={e => setNewChatId(e.target.value)}
              className="px-4 py-2 border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all flex-1 min-w-[200px]"
            />
-           <button type="submit" className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl flex items-center justify-center gap-2 transition-colors whitespace-nowrap">
+           <button type="submit" className="px-5 py-2 bg-black dark:bg-white hover:bg-neutral-800 dark:hover:bg-neutral-200 text-white dark:text-black rounded-xl flex items-center justify-center gap-2 transition-colors whitespace-nowrap">
              <Plus className="w-4 h-4" /> Message
            </button>
         </form>
@@ -90,7 +90,7 @@ export default function MessagingPage() {
             ) : (
                 conversations.map((conv) => (
                     <Link href={`/dashboard/messaging/${conv.partner.uniqueId}`} key={conv.partner.uniqueId} className="flex p-4 rounded-2xl hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors border border-transparent hover:border-neutral-200 dark:hover:border-neutral-700 group items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 text-indigo-600 flex items-center justify-center shrink-0">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-neutral-200 to-neutral-300 dark:from-neutral-700 dark:to-neutral-800 text-black dark:text-white flex items-center justify-center shrink-0">
                             {conv.partner.image ? (
                                 <img src={conv.partner.image} alt={conv.partner.name} className="w-full h-full rounded-full object-cover" />
                             ) : (
@@ -105,7 +105,7 @@ export default function MessagingPage() {
                             <p className="text-sm text-neutral-500 truncate">{conv.lastMessage}</p>
                         </div>
                         <div className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <ArrowRight className="w-5 h-5 text-indigo-500" />
+                            <ArrowRight className="w-5 h-5 text-black dark:text-white" />
                         </div>
                     </Link>
                 ))

@@ -57,7 +57,7 @@ export default function ProfileShareSettings() {
             {/* Find Others Section */}
             <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-3xl p-8 shadow-sm">
                 <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                    <Search className="w-5 h-5 text-indigo-500" />
+                    <Search className="w-5 h-5 text-black dark:text-white" />
                     Find a Peer
                 </h3>
                 <p className="text-neutral-500 mb-6 max-w-xl">
@@ -74,7 +74,7 @@ export default function ProfileShareSettings() {
                     <button 
                         type="submit"
                         disabled={!searchId.trim()}
-                        className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-medium transition-colors flex items-center gap-2"
+                        className="px-6 py-2.5 bg-black dark:bg-white hover:bg-neutral-800 dark:hover:bg-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed text-white dark:text-black rounded-xl font-medium transition-colors flex items-center gap-2"
                     >
                         View
                         <ExternalLink className="w-4 h-4" />
@@ -99,7 +99,7 @@ export default function ProfileShareSettings() {
                     <div className="flex gap-3 w-full">
                         <button 
                             onClick={copyToClipboard}
-                            className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20"
+                            className="flex-1 py-2.5 bg-black dark:bg-white hover:bg-neutral-800 dark:hover:bg-neutral-200 text-white dark:text-black rounded-xl font-medium transition-colors flex items-center justify-center gap-2 shadow-lg shadow-black/20 dark:shadow-white/20"
                         >
                             <Copy className="w-4 h-4" />
                             Copy Link
@@ -110,7 +110,7 @@ export default function ProfileShareSettings() {
                 {/* Info Card */}
                 <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-3xl p-8 shadow-sm flex flex-col justify-center">
                     <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                        <Share2 className="w-5 h-5 text-indigo-500" />
+                        <Share2 className="w-5 h-5 text-black dark:text-white" />
                         Your Unique ID
                     </h3>
                     <p className="text-neutral-500 mb-6">
@@ -135,9 +135,9 @@ export default function ProfileShareSettings() {
                         </div>
                     </div>
 
-                    <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800 rounded-xl">
-                        <h4 className="font-semibold text-blue-800 dark:text-blue-300 mb-1 text-sm">Pro Tip</h4>
-                        <p className="text-xs text-blue-600 dark:text-blue-400">
+                    <div className="mt-8 p-4 bg-neutral-100 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-xl">
+                        <h4 className="font-semibold text-black dark:text-white mb-1 text-sm">Pro Tip</h4>
+                        <p className="text-xs text-black dark:text-white">
                             You can add this QR code to your resume or portfolio website so recruiters can instantly verify your skills and project history.
                         </p>
                     </div>

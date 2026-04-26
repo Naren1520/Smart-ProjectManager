@@ -86,12 +86,12 @@ export default function RewardsPage() {
 
   return (
     <div className="p-8 max-w-4xl mx-auto">
-      <div className="mb-8 text-center bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl p-12 text-white shadow-xl relative overflow-hidden">
+      <div className="mb-8 text-center bg-gradient-to-r from-black to-neutral-800 dark:from-white dark:to-neutral-200 rounded-3xl p-12 text-white dark:text-black shadow-xl relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full bg-white/10 backdrop-blur-3xl z-0" />
         <div className="relative z-10">
             <h1 className="text-4xl font-bold mb-4">Your Achievements</h1>
             <div className="text-6xl font-extrabold mb-2">{points} XP</div>
-            <p className="text-blue-100">Level {level} {getLevelTitle(level)}</p>
+            <p className="text-white/80 dark:text-black/80">Level {level} {getLevelTitle(level)}</p>
         </div>
       </div>
 

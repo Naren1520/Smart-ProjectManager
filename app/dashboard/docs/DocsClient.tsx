@@ -87,7 +87,7 @@ export default function DocsClient({ initialDocs, teams }: DocsClientProps) {
             </button> */}
              <button 
                 onClick={() => setShowNewDocModal(true)}
-                className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors shadow-lg shadow-blue-500/20 flex items-center gap-2"
+                className="bg-black dark:bg-white hover:bg-neutral-800 dark:hover:bg-neutral-200 text-white dark:text-black px-4 py-2 rounded-lg font-medium text-sm transition-colors shadow-lg shadow-black/20 dark:shadow-white/20 flex items-center gap-2"
              >
                 <Plus className="w-4 h-4" />
                 New Doc
@@ -115,11 +115,11 @@ export default function DocsClient({ initialDocs, teams }: DocsClientProps) {
                     filteredDocs.map((doc, i) => (
                         <div key={doc._id} className={`p-4 flex items-center justify-between hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors cursor-pointer group ${i !== filteredDocs.length - 1 ? 'border-b border-neutral-100 dark:border-neutral-800' : ''}`}>
                             <div className="flex items-center gap-4">
-                                <div className="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600">
+                                <div className="w-10 h-10 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-black dark:text-white">
                                     <FileText className="w-5 h-5" />
                                 </div>
                                 <div>
-                                    <h3 className="font-medium group-hover:text-blue-500 transition-colors">{doc.title}</h3>
+                                    <h3 className="font-medium group-hover:text-black dark:group-hover:text-white transition-colors">{doc.title}</h3>
                                     <div className="flex items-center gap-2 text-xs text-neutral-500 mt-1">
                                         <span className="px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800">{doc.type}</span>
                                         <span>•</span>
@@ -134,7 +134,7 @@ export default function DocsClient({ initialDocs, teams }: DocsClientProps) {
                     <div className="flex flex-col items-center justify-center p-8 text-neutral-500 h-full">
                         <FileCode className="w-12 h-12 mb-4 opacity-20" />
                         <p>No documents found.</p>
-                        <button onClick={() => setShowNewDocModal(true)} className="text-blue-600 mt-2 hover:underline text-sm">Create your first document</button>
+                        <button onClick={() => setShowNewDocModal(true)} className="text-black dark:text-white mt-2 hover:underline text-sm">Create your first document</button>
                     </div>
                 )}
             </div>
@@ -255,7 +255,7 @@ export default function DocsClient({ initialDocs, teams }: DocsClientProps) {
                 <button 
                   type="submit" 
                   disabled={isSubmitting || teams.length === 0}
-                  className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-6 py-2 bg-black dark:bg-white hover:bg-neutral-800 dark:hover:bg-neutral-200 text-white dark:text-black rounded-lg font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Create Doc'}
                 </button>

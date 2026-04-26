@@ -216,7 +216,7 @@ export default function AIToolsPage() {
     <div className="p-4 md:p-8 max-w-6xl mx-auto space-y-6 md:space-y-8">
       <div>
         <h1 className="text-2xl md:text-3xl font-bold mb-2 flex items-center gap-2 md:gap-3">
-          <Sparkles className="w-6 h-6 md:w-8 md:h-8 text-blue-500" />
+          <Sparkles className="w-6 h-6 md:w-8 md:h-8 text-black dark:text-white" />
           AI Power Tools
         </h1>
         <p className="text-sm md:text-base text-neutral-500">
@@ -230,7 +230,7 @@ export default function AIToolsPage() {
           onClick={() => setActiveTab("tasks")}
           className={`whitespace-nowrap pb-3 sm:pb-4 px-3 sm:px-4 font-medium transition-colors relative text-sm sm:text-base ${
             activeTab === "tasks"
-              ? "text-blue-600"
+              ? "text-black dark:text-white"
               : "text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
           }`}
         >
@@ -249,7 +249,7 @@ export default function AIToolsPage() {
           onClick={() => setActiveTab("resume")}
           className={`whitespace-nowrap pb-3 sm:pb-4 px-3 sm:px-4 font-medium transition-colors relative text-sm sm:text-base ${
             activeTab === "resume"
-              ? "text-blue-600"
+              ? "text-black dark:text-white"
               : "text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
           }`}
         >
@@ -268,7 +268,7 @@ export default function AIToolsPage() {
           onClick={() => setActiveTab("assistant")}
           className={`whitespace-nowrap pb-3 sm:pb-4 px-3 sm:px-4 font-medium transition-colors relative text-sm sm:text-base ${
             activeTab === "assistant"
-              ? "text-blue-600"
+              ? "text-black dark:text-white"
               : "text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
           }`}
         >
@@ -389,7 +389,7 @@ export default function AIToolsPage() {
                   Upload PDF or Paste Resume
                 </label>
 
-                <div className="mb-6 p-4 border-2 border-dashed border-neutral-200 dark:border-neutral-800 rounded-xl bg-neutral-50 dark:bg-neutral-800/50 hover:border-blue-500 transition-colors cursor-pointer relative group">
+                <div className="mb-6 p-4 border-2 border-dashed border-neutral-200 dark:border-neutral-800 rounded-xl bg-neutral-50 dark:bg-neutral-800/50 hover:border-black dark:hover:border-white transition-colors cursor-pointer relative group">
                   <input
                     type="file"
                     accept=".pdf"
@@ -402,7 +402,7 @@ export default function AIToolsPage() {
                     }}
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                   />
-                  <div className="flex flex-col items-center justify-center text-neutral-500 dark:text-neutral-400 py-4 group-hover:text-blue-500 transition-colors">
+                  <div className="flex flex-col items-center justify-center text-neutral-500 dark:text-neutral-400 py-4 group-hover:text-black dark:group-hover:text-white transition-colors">
                     <FileText className="w-8 h-8 mb-2" />
                     <span className="text-sm font-medium">
                       {resumeFile ? resumeFile.name : "Click to upload PDF"}
@@ -498,7 +498,7 @@ export default function AIToolsPage() {
                                       (ms: string, msIdx: number) => (
                                         <span
                                           key={msIdx}
-                                          className="text-[10px] px-2 py-0.5 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 rounded border border-blue-200 dark:border-blue-800"
+                                          className="text-[10px] px-2 py-0.5 bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white rounded border border-neutral-300 dark:border-neutral-600"
                                         >
                                           {ms}
                                         </span>
@@ -519,7 +519,7 @@ export default function AIToolsPage() {
                         (skill: string, i: number) => (
                           <span
                             key={i}
-                            className="px-3 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-full text-sm font-medium"
+                            className="px-3 py-1 bg-neutral-100 dark:bg-neutral-800 text-black dark:text-white rounded-full text-sm font-medium"
                           >
                             {skill}
                           </span>
@@ -540,7 +540,7 @@ export default function AIToolsPage() {
                                 key={idx}
                                 className="p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm"
                               >
-                                <h4 className="font-semibold text-indigo-600 dark:text-indigo-400 mb-1 flex items-center justify-between">
+                                <h4 className="font-semibold text-black dark:text-white mb-1 flex items-center justify-between">
                                   {proj.title}
                                 </h4>
                                 <p className="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed mb-2">
@@ -586,7 +586,7 @@ export default function AIToolsPage() {
           >
             <div className="flex items-center justify-between p-4 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/50">
               <h3 className="font-semibold flex items-center gap-2">
-                <Bot className="w-5 h-5 text-blue-600" />
+                <Bot className="w-5 h-5 text-black dark:text-white" />
                 AI Assistant
               </h3>
               <button
@@ -606,14 +606,14 @@ export default function AIToolsPage() {
                   className={`flex gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                 >
                   {msg.role === "ai" && (
-                    <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+                    <div className="w-8 h-8 rounded-full bg-neutral-200 dark:bg-neutral-700 text-black dark:text-white flex items-center justify-center shrink-0">
                       <Bot className="w-5 h-5" />
                     </div>
                   )}
                   <div
                     className={`max-w-[75%] p-4 rounded-2xl text-sm ${
                       msg.role === "user"
-                        ? "bg-blue-600 text-white rounded-br-none"
+                        ? "bg-black dark:bg-white text-white dark:text-black rounded-br-none"
                         : "bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-gray-100 rounded-bl-none whitespace-pre-wrap"
                     }`}
                   >
@@ -628,8 +628,8 @@ export default function AIToolsPage() {
               ))}
               {isChatSeding && (
                 <div className="flex gap-3 justify-start">
-                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-                    <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+                  <div className="w-8 h-8 rounded-full bg-neutral-200 dark:bg-neutral-700 flex items-center justify-center shrink-0">
+                    <Loader2 className="w-5 h-5 animate-spin text-black dark:text-white" />
                   </div>
                 </div>
               )}
@@ -649,7 +649,7 @@ export default function AIToolsPage() {
               <button
                 type="submit"
                 disabled={isChatSeding || !chatInput.trim()}
-                className="p-2.5 md:p-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center shrink-0"
+                className="p-2.5 md:p-3 bg-black dark:bg-white text-white dark:text-black rounded-xl hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors disabled:opacity-50 flex items-center justify-center shrink-0"
               >
                 <Send className="w-5 h-5" />
               </button>

@@ -23,7 +23,7 @@ export function Sidebar() {
   return (
     <aside className="hidden md:flex w-64 flex-col border-r bg-white/50 dark:bg-black/50 backdrop-blur-xl border-neutral-200 dark:border-neutral-800 h-screen sticky top-0">
       <div className="p-6">
-        <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+        <h1 className="text-2xl font-bold text-black dark:text-white">
           TeamForge AI
         </h1>
       </div>
@@ -38,11 +38,11 @@ export function Sidebar() {
               className={cn(
                 "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group",
                 isActive 
-                  ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30" 
+                  ? "bg-black dark:bg-white text-white dark:text-black shadow-lg shadow-black/30 dark:shadow-white/30" 
                   : "hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-600 dark:text-neutral-400"
               )}
             >
-              <Icon className={cn("w-5 h-5", isActive ? "text-white" : "text-neutral-500 group-hover:text-neutral-900 dark:group-hover:text-neutral-200")} />
+              <Icon className={cn("w-5 h-5", isActive ? "text-white dark:text-black" : "text-neutral-500 group-hover:text-neutral-900 dark:group-hover:text-neutral-200")} />
               <span className="font-medium">{link.label}</span>
             </Link>
           );

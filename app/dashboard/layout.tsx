@@ -45,7 +45,7 @@ export default async function DashboardLayout({
                   className="rounded-full ring-2 ring-neutral-200 dark:ring-neutral-800"
                 />
               ) : (
-                <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white">
+                <div className="h-8 w-8 rounded-full bg-black dark:bg-white flex items-center justify-center text-white dark:text-black">
                   {session.user?.name?.[0] || 'U'}
                 </div>
               )}

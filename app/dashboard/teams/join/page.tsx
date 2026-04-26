@@ -66,7 +66,7 @@ export default function JoinTeamPage() {
                     />
                 </div>
 
-                <div className="bg-blue-50 dark:bg-neutral-800/50 p-4 rounded-xl text-sm text-neutral-600 dark:text-neutral-400">
+                <div className="bg-neutral-100 dark:bg-neutral-800/50 p-4 rounded-xl text-sm text-neutral-600 dark:text-neutral-400">
                     <p>Don't have a code? Ask your team leader to generate one from the team settings page.</p>
                 </div>
 
