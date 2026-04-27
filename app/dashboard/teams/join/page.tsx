@@ -2,12 +2,14 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTheme } from 'next-themes';
 import { Users, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 
 export default function JoinTeamPage() {
   const router = useRouter();
+  const { theme } = useTheme();
   const [loading, setLoading] = useState(false);
   const [code, setCode] = useState('');
 
@@ -73,7 +75,11 @@ export default function JoinTeamPage() {
                 <button 
                     type="submit" 
                     disabled={loading || code.length < 6}
-                    className="w-full py-4 bg-violet-600 hover:bg-violet-700 text-white rounded-xl font-semibold shadow-lg shadow-violet-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className={`w-full py-4 rounded-xl font-semibold shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+                      theme === 'dark'
+                        ? 'bg-white hover:bg-neutral-100 text-black shadow-white/30'
+                        : 'bg-black hover:bg-neutral-800 text-white shadow-black/30'
+                    }`}
                 >
                     {loading ? 'Joining Team...' : 'Join Workspace'}
                 </button>

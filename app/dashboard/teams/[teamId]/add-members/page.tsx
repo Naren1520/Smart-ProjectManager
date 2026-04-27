@@ -2,6 +2,7 @@
 
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTheme } from 'next-themes';
 import { UserPlus, ArrowRight, Check, Trash2, Shield, User as UserIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Loader } from '@/components/Loader';
@@ -25,6 +26,7 @@ interface Team {
 export default function AddMembersPage({ params }: { params: Promise<{ teamId: string }> }) {
   const router = useRouter();
   const { teamId } = use(params);
+  const { theme } = useTheme();
   
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
@@ -123,7 +125,11 @@ export default function AddMembersPage({ params }: { params: Promise<{ teamId: s
                             <button 
                                 type="submit" 
                                 disabled={adding || !uniqueId}
-                                className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold shadow-lg shadow-blue-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                className={`w-full py-3 rounded-xl font-semibold shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${
+                                  theme === 'dark'
+                                    ? 'bg-white hover:bg-neutral-100 text-black shadow-white/30'
+                                    : 'bg-black hover:bg-neutral-800 text-white shadow-black/30'
+                                }`}
                             >
                                 {adding ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div> : <><UserPlus className="w-4 h-4" /> Add Member</>}
                             </button>

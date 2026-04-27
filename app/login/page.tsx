@@ -1,6 +1,7 @@
 'use client';
 
 import { signIn } from 'next-auth/react';
+import { useTheme } from 'next-themes';
 import { Shield, Layout, ArrowLeft, Activity, GitBranch, Terminal } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -204,6 +205,7 @@ const DashboardBackground = ({ mouseX, mouseY }: { mouseX: MotionValue<number>; 
 export default function LoginPage() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/dashboard/teams';
+  const { theme } = useTheme();
 
   const handleGoogleSignIn = () => {
     signIn('google', { callbackUrl });
@@ -283,7 +285,11 @@ export default function LoginPage() {
                 {/* Google Button */}
                 <button
                     onClick={handleGoogleSignIn}
-                    className="w-full relative group/btn bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 hover:from-blue-500 hover:via-indigo-500 hover:to-violet-500 text-white rounded-xl py-4 px-6 font-semibold shadow-lg shadow-blue-500/25 transition-all duration-300 hover:scale-[1.02] hover:shadow-indigo-500/40 active:scale-[0.98] overflow-hidden"
+                    className={`w-full relative group/btn rounded-xl py-4 px-6 font-semibold shadow-lg transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] overflow-hidden ${
+                      theme === 'dark'
+                        ? 'bg-white hover:bg-neutral-100 text-black shadow-white/25 hover:shadow-white/40'
+                        : 'bg-black hover:bg-neutral-800 text-white shadow-black/25 hover:shadow-black/40'
+                    }`}
                 >
                     <div className="flex items-center justify-center gap-3 relative z-10">
                         <div className="p-1 bg-white rounded-full">
